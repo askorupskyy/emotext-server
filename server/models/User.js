@@ -38,6 +38,15 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    allowNonContactsToText: {
+        type: Boolean,
+        default: false,
+    },
+    allowNonContactsToSeeRealName: {
+        type: Boolean,
+        default: false,
+    },
+    //many more privacy settings;
 });
 
 UserSchema.methods.generateHash = function (password) {

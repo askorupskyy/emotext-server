@@ -350,4 +350,24 @@ router.post('/reset-password/', (req, res) => {
     });
 });
 
+router.get('/get-user-by-id/', (req, res) => {
+    const { query } = req;
+    const { id } = query;
+    User.findOne({ _id: id }, (err, usr) => {
+        if (err) {
+            return res.send({
+                success: false,
+                message: err,
+            });
+        }
+        else {
+            return res.send({
+                success: true,
+                message: 'User Found!',
+                user: usr,
+            });
+        }
+    });
+});
+
 module.exports = router;

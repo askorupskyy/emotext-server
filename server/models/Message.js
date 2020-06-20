@@ -13,22 +13,6 @@ const messageSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
-    imageSource: {
-        type: String,
-        default: '',
-    },
-    videoSource: {
-        type: String,
-        default: '',
-    },
-    audioMessageSource: {
-        type: String,
-        default: '',
-    },
-    poll: {
-        type: Number,
-        default: 0,
-    },
     isRead: {
         type: Boolean,
         default: false,

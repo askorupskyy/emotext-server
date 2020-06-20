@@ -1,15 +1,19 @@
 const mongoose = require('mongoose');
 
 const chatSchema = new mongoose.Schema({
-    users: {
-        type: [String],
-        default: [],
+    userOne: {
+        type: String,
+        default: '',
+    },
+    userTwo: {
+        type: String,
+        default: '',
     },
     isDeleted: {
         type: Boolean,
         default: false,
     },
-    link: {
+    name: {
         type: String,
         default: '',
     },
