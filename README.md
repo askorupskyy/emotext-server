@@ -188,7 +188,7 @@ Method **POST**
 Accepts the message **text**, the **time**, the auth **token**, and the **chatId** in body.
 
 
-## Load Chat Info
+### Load Chat Info
 
 Request URL `http://{our_ip}:5000/api/chat/load-chat/`
 
@@ -201,7 +201,7 @@ Return the info about the chat: IDs of ppl in it, and the name of the chat.
 **ONLY WORKS FOR CHATS WITH 2 PPL IN IT RIGHT NOW**
 
 
-## Create Chat 
+### Create Chat 
 
 Request URL `http://{our_ip}:5000/api/chat/create-chat/`
 
@@ -212,7 +212,7 @@ Accepts the **userTo** ID of the User you want to create a chat with and your cu
 Will create an empty conversation with the person.
 
 
-## Load Messages 
+### Load Messages 
 
 Request URL `http://{our_ip}:5000/api/chat/load-messages/`
 
@@ -248,7 +248,7 @@ Will return an array or messages:
 ```
 
 
-## Load Chats 
+### Load Chats 
 
 Request URL `http://{our_ip}:5000/api/chat/load-chats/`
 
