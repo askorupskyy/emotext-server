@@ -30,15 +30,15 @@ If not, then the message will tell you why.
 
 # API docs
 
-[Auth (users and authentication)](#auth)
+[Auth - users and authentication](#auth)
 
-[Chats (messaging and chats)](#chat)
+[Chats - messaging and chats](#chat)
 
 [Friendships](#friendships)
 
 [Media](#media)
 
-## Auth - 80% Done
+## Auth
 
 [Login](#login) - Done and Tested
 
@@ -63,7 +63,7 @@ If not, then the message will tell you why.
 [Get User By Token](#get-user-by-token) - Done and Tested
 
 
-## Chat - 50% Done
+## Chat
 
 [Send Message](#send-message) - Done and Tested
 
