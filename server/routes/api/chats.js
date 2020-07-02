@@ -6,6 +6,7 @@ const Message = require('../../models/Message');
 const UserChat = require('../../models/UserChat');
 const UserSession = require('../../models/UserSession');
 const Chat = require('../../models/Chat');
+const generateLink = require('../../util/generateBytes');
 
 router.post('/send-message/', (req, res, next) => {
     const { body } = req;
@@ -214,7 +215,5 @@ router.get('/load-chats/', (req, res, next) => {
         }
     });
 });
-
-
 
 module.exports = router;

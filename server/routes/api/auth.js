@@ -7,6 +7,7 @@ const PasswordResetCode = require('../../models/PasswordResetCode');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
+const fileUpload = require('express-fileupload');
 
 const { SMTP_EMAIL, SMTP_PASSWORD, HOST } = require('../../cfg');
 
@@ -395,10 +396,62 @@ router.put('/change-bio/', (req, res) => {
                         message: `Bio Updated.`,
                     });
                 }
-            })
+            });
         }
-    })
-})
+    });
+});
 
+router.post('/update-profile-picture/', async (req, res) => {
+    try {
+        if (!req.files) {
+            res.send({
+                success: false,
+                message: 'No File Uploaded.'
+            });
+        }
+        else {
+            const { token } = req.body;
+            let avatar = req.files.profilePicture;
+            UserSession.find({ _id: token, isDeleted: false }, (err, sessions) => {
+                if (err) {
+                    return res.send({
+                        success: false,
+                        message: `Server Error: ${err}`,
+                    });
+                }
+                if (!sessions) {
+                    return res.send({
+                        success: false,
+                        message: `Invalid Token`
+                    });
+                }
+                else {
+                    let extension = avatar.substring(avatar.indexOf(".") + 1);
+                    User.findByIdAndUpdate({ _id: sessions[0].userId }, { $set: { profilePictureURL: `../../media/profile-pictures/${userId}${extension}` } }, (err, user) => {
+                        if (err) {
+                            return res.send({
+                                success: false,
+                                message: `Server Error: ${err}`,
+                            });
+                        }
+                        else {
+                            return res.send({
+                                success: true,
+                                message: 'Profile Picture Updated!'
+                            })
+                        }
+                    })
+                }
+            });
+            avatar.mv(`../../media/profile-pictures/`)
+        }
+    }
+    catch{
+        return res.send({
+            success: false,
+            message: 'Server Error.'
+        })
+    }
+});
 
 module.exports = router;
