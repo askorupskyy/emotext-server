@@ -17,10 +17,10 @@ const messageSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    deletedForMe: {
-        type: Boolean,
-        default: false,
-    },
+    chatId: {
+        type: String,
+        default: '',
+    }
 });
 
 module.exports = mongoose.model('Message', messageSchema);

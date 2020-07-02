@@ -12,7 +12,15 @@ const FriendSchema = new mongoose.Schema({
     didAccept: {
         type: Boolean,
         default: false,
-    }
+    },
+    didBlock: {
+        type: Boolean,
+        default: false
+    },
+    didMute: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 module.exports = mongoose.model('Friend', FriendSchema);

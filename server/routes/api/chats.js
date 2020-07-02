@@ -46,6 +46,7 @@ router.post('/send-message/', (req, res, next) => {
                     message.fromId = user._id;
                     message.text = text;
                     message.time = time;
+                    message.chatId = chat._id;
                     message.save((err, doc) => {
                         if (err) {
                             return res.send({

@@ -34,9 +34,9 @@ smtpTransport.use('compile', hbs(handlebarsOptions));
 
 router.post('/signup/', (req, res) => {
     const { body } = req;
-    const { firstName, lastName, password, username } = body;
+    const { name, password, username } = body;
     let { email } = body;
-    if (!firstName || !lastName || !password || !email || !username) {
+    if (!name || !password || !email || !username) {
         return res.send({
             success: false,
             message: 'Fill out all the fields!',
@@ -66,8 +66,7 @@ router.post('/signup/', (req, res) => {
 
             const newUser = new User();
             newUser.email = email;
-            newUser.lastName = lastName;
-            newUser.firstName = firstName;
+            newUser.name = name;
             newUser.password = newUser.generateHash(password);
             newUser.userName = username;
             newUser.save((err, user) => {
@@ -200,10 +199,7 @@ router.get('/get-user-by-token/', (req, res) => {
             }
             return res.send({
                 success: true,
-                userFirstName: user.firstName,
-                userLastName: user.lastName,
-                userEmail: user.email,
-                username: user.userName,
+                user: user
             })
         })
     });
