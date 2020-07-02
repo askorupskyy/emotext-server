@@ -366,4 +366,39 @@ router.get('/get-user-by-id/', (req, res) => {
     });
 });
 
+router.put('/change-bio/', (req, res) => {
+    const { token, bio } = req;
+    UserSession.find({ _id: token, isDeleted: false, }, (err, sessions) => {
+        if (err) {
+            return res.send({
+                success: false,
+                message: `Server Error: ${err}`
+            });
+        }
+        if (!sessions) {
+            return res.send({
+                success: false,
+                message: `No sessions found.`
+            });
+        }
+        else {
+            User.findByIdAndUpdate({ _id: sessions[0].userId }, { $set: { bio: bio } }, null, (err, user) => {
+                if (err) {
+                    return res.send({
+                        success: false,
+                        message: `Server Error: ${err}`,
+                    });
+                }
+                else {
+                    return res.send({
+                        success: true,
+                        message: `Bio Updated.`,
+                    });
+                }
+            })
+        }
+    })
+})
+
+
 module.exports = router;
