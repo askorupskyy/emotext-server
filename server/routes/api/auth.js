@@ -427,7 +427,7 @@ router.post('/update-profile-picture/', async (req, res) => {
                 }
                 else {
                     let extension = avatar.substring(avatar.indexOf(".") + 1);
-                    User.findByIdAndUpdate({ _id: sessions[0].userId }, { $set: { profilePictureURL: `../../media/profile-pictures/${userId}${extension}` } }, (err, user) => {
+                    User.findByIdAndUpdate({ _id: sessions[0].userId }, { $set: { profilePictureURL: `../../media/profile-pictures/${userId}${extension}` } }, null, (err, user) => {
                         if (err) {
                             return res.send({
                                 success: false,
@@ -452,6 +452,40 @@ router.post('/update-profile-picture/', async (req, res) => {
             message: 'Server Error.'
         })
     }
+});
+
+router.put('/change-private-settings/', (req, res) => {
+    const { seeEmail, textMe, seeRealName, token } = req;
+    UserSession.find({ _id: token, isDeleted: false }, (err, sessions) => {
+        if (err) {
+            return res.send({
+                success: false,
+                message: `Server Error: ${err}`,
+            });
+        }
+        if (!sessions) {
+            return res.send({
+                success: false,
+                message: `Invalid Token.`
+            });
+        }
+        else {
+            User.findByIdAndUpdate({ _id: sessions[0].id }, { $set: { seeEmail: seeEmail, textMe: textMe, seeRealName: seeRealName } }, (err, user) => {
+                if (err) {
+                    return res.send({
+                        success: false,
+                        message: `Server Error: ${err}.`
+                    });
+                }
+                else {
+                    return res.send({
+                        success: true,
+                        message: `User Privacy Settings Updated.`
+                    });
+                }
+            });
+        }
+    });
 });
 
 module.exports = router;
