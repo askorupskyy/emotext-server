@@ -2,11 +2,6 @@ const sequelize = require('../util/db');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 
 const UserSession = sequelize.define('UserSession', {
-    id: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        default: '',
-    },
     userId: {
         type: DataTypes.STRING,
         allowNull: false,

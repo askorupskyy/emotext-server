@@ -2,11 +2,6 @@ const sequelize = require('../util/db');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 
 const EmailVerificationCode = sequelize.define('EmailVerificationCode', {
-    id: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        default: '',
-    },
     code: {
         type: DataTypes.STRING,
         allowNull: false,

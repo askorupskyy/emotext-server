@@ -2,11 +2,6 @@ const sequelize = require('../util/db');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 
 const User = sequelize.define('User', {
-    id: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        default: '',
-    },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
