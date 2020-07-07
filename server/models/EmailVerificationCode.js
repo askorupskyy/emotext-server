@@ -1,18 +1,26 @@
-const mongoose = require("mongoose");
+const sequelize = require('../util/db');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
-const EmailVerificationCode = new mongoose.Schema({
+const EmailVerificationCode = sequelize.define('EmailVerificationCode', {
+    id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
+    },
     code: {
-        type: String,
-        default: "",
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
     },
     email: {
-        type: String,
-        default: "",
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
     },
     date: {
-        type: Date,
+        type: DataTypes.DATE,
         default: Date.now(),
     }
 });
 
-module.exports = mongoose.model('EmailVerificationCode', EmailVerificationCode);
+module.exports = EmailVerificationCode;

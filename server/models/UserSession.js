@@ -1,18 +1,25 @@
-const mongoose = require('mongoose');
+const sequelize = require('../util/db');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
-const UserSessionSchema = new mongoose.Schema({
+const UserSession = sequelize.define('UserSession', {
+    id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
+    },
     userId: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     timestamp: {
-        type: Date,
+        type: DataTypes.DATE,
         default: Date.now(),
     },
     isDeleted: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
         default: false,
     },
 });
 
-module.exports = mongoose.model('UserSession', UserSessionSchema);
+module.exports = UserSession;

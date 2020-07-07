@@ -1,22 +1,32 @@
-const mongoose = require('mongoose');
+const sequelize = require('../util/db');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
-const chatSchema = new mongoose.Schema({
+const Chat = sequelize.define('Chat', {
+    id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
+    },
     userOne: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     userTwo: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     isDeleted: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
         default: false,
     },
     name: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
 });
 
-module.exports = mongoose.model('Chat', chatSchema);
+module.exports = Chat

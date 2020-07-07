@@ -1,17 +1,15 @@
-const mongoose = require('mongoose');
 const { DB_USER, DB_PASSWORD } = require('../cfg');
-const url = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@cluster0-dqmky.mongodb.net/test?retryWrites=true&w=majority`
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize('postgres',
+    DB_USER || 'postgres',
+    DB_PASSWORD || '',
+    {
+        host: DB_HOST || 'localhost',
+        port: DB_PORT || 5432,
+        dialect: 'postgres',
+        dialectOptions: {
+            ssl: process.env.DB_SSL == "true"
+        }
+    });
 
-mongoose.connect(url, { useNewUrlParser: true });
-
-const db = mongoose.connection;
-
-db.on('error', (err) => {
-    throw err;
-});
-
-db.on('open', () => {
-    console.log('Connection Successfull');
-})
-
-module.exports = db;
+module.exports = sequelize;

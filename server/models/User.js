@@ -1,45 +1,54 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const sequelize = require('../util/db');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
-const UserSchema = new mongoose.Schema({
+const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
+    },
     name: {
-        type: String,
-        default: "",
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
     },
     email: {
-        type: String,
-        default: "",
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
     },
     password: {
-        type: String,
-        default: "",
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
     },
     profilePictureURL: {
-        type: String,
-        default: "",
+        type: DataTypes.STRING,
+        default: '',
     },
     bio: {
-        type: String,
-        default: "",
+        type: DataTypes.STRING,
+        default: '',
     },
     isDeleted: {
-        type: Boolean,
+        type: DataTypes.STRING,
         default: false
     },
     userName: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     seeRealName: {
-        type: Number,
+        type: DataTypes.NUMBER,
         default: 0,
     },
     seeEmail: {
-        type: Number,
+        type: DataTypes.NUMBER,
         default: 0,
     },
     textMe: {
-        type: Number,
+        type: DataTypes.NUMBER,
         default: 0
     },
     // 0 - everybody
@@ -47,21 +56,13 @@ const UserSchema = new mongoose.Schema({
     // 2 - noobody
     //many more privacy settings;
     isOnline: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
         default: false
     },
     lastSeen: {
-        type: Date,
+        type: DataTypes.DATE,
         default: Date.now()
     }
 });
 
-UserSchema.methods.generateHash = function (password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-};
-
-UserSchema.methods.validatePassword = function (password) {
-    return bcrypt.compareSync(password, this.password);
-};
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = User;

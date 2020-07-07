@@ -1,26 +1,34 @@
-const mongoose = require('mongoose');
+const sequelize = require('../util/db');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
-const FriendSchema = new mongoose.Schema({
+const Friendship = sequelize.define('Friendship', {
+    id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
+    },
     userOneId: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     userTwoId: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     didAccept: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
         default: false,
     },
     didBlock: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
         default: false
     },
     didMute: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
         default: false,
     },
 });
 
-module.exports = mongoose.model('Friend', FriendSchema);
+module.exports = Friendship;

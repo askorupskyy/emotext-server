@@ -1,26 +1,35 @@
-const mongoose = require('mongoose');
+const sequelize = require('../util/db');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
-const messageSchema = new mongoose.Schema({
+const Message = sequelize.define('Message', {
+    id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        default: '',
+    },
     time: {
-        type: Date,
+        type: DataTypes.DATE,
         default: Date.now(),
     },
     fromId: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     text: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     },
     isRead: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
         default: false,
     },
     chatId: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         default: '',
     }
 });
 
-module.exports = mongoose.model('Message', messageSchema);
+module.exports = Message;
