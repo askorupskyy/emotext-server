@@ -2,6 +2,12 @@ const sequelize = require('../util/db');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 
 const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -35,15 +41,15 @@ const User = sequelize.define('User', {
         default: '',
     },
     seeRealName: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         default: 0,
     },
     seeEmail: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         default: 0,
     },
     textMe: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         default: 0
     },
     // 0 - everybody

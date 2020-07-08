@@ -2,6 +2,12 @@ const sequelize = require('../util/db');
 const { Sequelize, DataTypes, Model } = require('sequelize');
 
 const Friendship = sequelize.define('Friendship', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+    },
     userOneId: {
         type: DataTypes.STRING,
         allowNull: false,
