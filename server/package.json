@@ -4,6 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "pm2": "pm2 start processes.json --no-daemon",
+    "migrate": "node ./util/migrate.js",
+    "start": "node ./server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -22,6 +25,7 @@
     "nodemailer-express-handlebars": "^3.1.0",
     "nodemon": "^2.0.2",
     "pg": "^8.2.2",
+    "pm2": "^4.4.0",
     "postman": "^0.2.0",
     "sequelize": "^5.22.3",
     "streamsearch": "^0.1.2"
