@@ -14,8 +14,8 @@ generateHash = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
 
-validatePassword = function (password) {
-    return bcrypt.compareSync(password, this.password);
+validatePassword = function (password, password2) {
+    return bcrypt.compareSync(password, password2);
 };
 
-module.exports = generateLink;
+module.exports = { generateLink, generateHash, validatePassword };
