@@ -2,11 +2,6 @@ const express = require('express');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
-const fileUpload = require('express-fileupload');
-
-const User = require('../../models/User');
-const UserSession = require('../../models/UserSession');
-const PasswordResetCode = require('../../models/PasswordResetCode');
 
 const { findUserByEmailAndUserName, findUserByEmail, findUserSession, findUserBySession, findUserByID } = require('../../controllers/users/findUser');
 const createUser = require('../../controllers/users/createUser');
@@ -15,9 +10,7 @@ const { getPasswordResetCode, createPasswordResetCode } = require('../../control
 const { SMTP_EMAIL, SMTP_PASSWORD, HOST } = require('../../cfg');
 
 const { generateLink, validatePassword, generateHash } = require('../../util/generateBytes');
-const { reset } = require('nodemon');
 const { setProfilePicture, updatePrivacySettings } = require('../../controllers/users/updateUser');
-const { text } = require('express');
 
 const router = express.Router();
 

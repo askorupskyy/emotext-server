@@ -1,7 +1,6 @@
 const User = require('../../models/User');
 const UserSession = require('../../models/UserSession');
 const { findUserBySession } = require('./findUser');
-const { text } = require('express');
 
 async function setSessionDeleted(token) {
     const session = await UserSession.findOne({ where: { id: token, isDeleted: false } });
