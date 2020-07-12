@@ -53,7 +53,7 @@ router.post('/signup/', async (req, res) => {
         if (user != null) {
             return res.status(401).send({
                 success: false,
-                message: 'A User with these credentials already exists fuck',
+                message: 'A User with these credentials already exists',
             })
         }
         let validPasswordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
