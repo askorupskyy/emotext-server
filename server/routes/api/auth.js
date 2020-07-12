@@ -3,6 +3,8 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 
+const UserSession = require('../../models/UserSession');
+
 const { findUserByEmailAndUserName, findUserByEmail, findUserSession, findUserBySession, findUserByID } = require('../../controllers/users/findUser');
 const createUser = require('../../controllers/users/createUser');
 const { getPasswordResetCode, createPasswordResetCode } = require('../../controllers/users/emails');
@@ -51,7 +53,7 @@ router.post('/signup/', async (req, res) => {
         if (user != null) {
             return res.status(401).send({
                 success: false,
-                message: 'A User with these credentials already exists',
+                message: 'A User with these credentials already exists fuck',
             })
         }
         let validPasswordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
@@ -124,7 +126,7 @@ router.post('/signin/', async (req, res) => {
     } catch (e) {
         return res.status(500).send({
             success: false,
-            message: 'Server Error'
+            message: 'Server Error',
         })
     }
 })
@@ -443,7 +445,7 @@ router.post('/update-profile-picture/', async (req, res) => {
     }
 });
 
-router.put('/change-private-settings/', (req, res) => {
+router.put('/change-private-settings/', async (req, res) => {
     const { seeEmail, textMe, seeRealName, token } = req;
     try {
         const updated = await updatePrivacySettings(token, { seeEmail: seeEmail, textMe: textMe, seeRealName: seeRealName });

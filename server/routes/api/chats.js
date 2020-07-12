@@ -130,7 +130,7 @@ router.post('/create-chat/', async (req, res, next) => {
     }
 });
 
-router.get('/load-messages/', (req, res, next) => {
+router.get('/load-messages/', async (req, res, next) => {
     const { query } = req;
     const { part, chatId } = query;
     try {
@@ -155,12 +155,12 @@ router.get('/load-messages/', (req, res, next) => {
     }
 });
 
-router.get('/load-chats/', (req, res, next) => {
+router.get('/load-chats/', async (req, res, next) => {
     const { query } = req;
     const { token } = query;
 
     try {
-        const chats = await findUserChats();
+        const chats = await findUserChats(token);
         return res.status(202).send({
             success: true,
             message: 'Chats Loaded',
