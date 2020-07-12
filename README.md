@@ -1,14 +1,18 @@
 # messaging-app
 
-# Development Environment
+# Testing and Front-End Dev Environment
 
-Make sure **Node.js** in installed on your computer.
+Make sure **Docker** is installed on your computer and that you have an account in it.
 
 Clone the project onto your own machine.
 
-Navigate to the server folder and run `npm install` or `sudo npm install` if on Linux.
+Run the `docker-compose build` and `docker-compose up` commands to run the project.
 
-Run `npm start` to start the server.
+Run the `docker-compose down` command to close the project.
+
+**The server and the database will always be running unless you use the command to close it**
+
+The following commands are responsible for testing, installing, and starting the project **both on Node and Python**
 
 # API response structure
 
