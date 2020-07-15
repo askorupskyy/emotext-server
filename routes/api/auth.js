@@ -127,11 +127,13 @@ router.post("/signin/", async (req, res) => {
       });
     }
     try {
-      const newUserSession = await UserSession.create({ userId: user.id });
+      const newUserSession = await UserSession.create({
+        userId: user.uuid,
+      });
       return res.status(200).send({
         success: true,
         message: "Signed In",
-        token: newUserSession.id,
+        token: newUserSession.uuid,
       });
     } catch (e) {
       return res.status(500).send({
@@ -165,7 +167,7 @@ router.get("/verify/", async (req, res) => {
   } catch (e) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: e,
     });
   }
 });
@@ -174,21 +176,29 @@ router.get("/logout/", async (req, res) => {
   const { query } = req;
   const { token } = query;
   try {
-    const session = await setSessionDeleted(token);
+    const session = await findUserSession(token);
     if (!session) {
       return res.status(401).send({
         success: false,
         message: "Invalid Token",
       });
     }
-    return res.status(200).send({
-      success: true,
-      message: "Logged Out.",
-    });
+    try {
+      await session.update({ isDeleted: true });
+      return res.status(200).send({
+        success: true,
+        message: "Logged Out.",
+      });
+    } catch (e) {
+      return res.status(500).send({
+        success: false,
+        message: e + "",
+      });
+    }
   } catch (e) {
     return res.status(500).send({
       success: false,
-      message: "Server Error",
+      message: e + "",
     });
   }
 });
@@ -210,7 +220,10 @@ router.get("/get-user-by-token/", async (req, res) => {
       user: user,
     });
   } catch (e) {
-    return res.status(500).send({ success: false, message: "Server Error" });
+    return res.status(500).send({
+      success: false,
+      message: "Server Error",
+    });
   }
 });
 
@@ -235,12 +248,10 @@ router.post("/get-reset-token/", async (req, res) => {
 
     smtpTransport.sendMail(data, function (err) {
       if (!err)
-        return res
-          .status(200)
-          .send({
-            success: true,
-            message: "Done! Kindly check your email for further instructions",
-          });
+        return res.status(200).send({
+          success: true,
+          message: "Done! Kindly check your email for further instructions",
+        });
       return res.status(500).send({
         success: false,
         message: "Server Error",
@@ -315,7 +326,9 @@ router.post("/reset-password/", async (req, res) => {
             message: "Invalid Code",
           });
         } else {
-          user.update({ password: generateHash(password) });
+          user.update({
+            password: generateHash(password),
+          });
           return res.status(200).send({
             success: true,
             message: "Password Changed!",
@@ -378,7 +391,9 @@ router.put("/change-bio/", async (req, res) => {
           message: "Invalid Session",
         });
       }
-      await user.update({ bio: bio });
+      await user.update({
+        bio: bio,
+      });
       return res.status(200).send({
         success: true,
         message: "Bio Updated",

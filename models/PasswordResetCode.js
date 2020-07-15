@@ -1,27 +1,26 @@
-const sequelize = require('../util/db');
-const { DataTypes } = require('sequelize');
+const sequelize = require("../util/db");
+const { DataTypes, Sequelize } = require("sequelize");
 
-const PasswordResetCode = sequelize.define('PassowrdResetCode', {
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
-        primaryKey: true,
-    },
-    code: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        default: '',
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        default: '',
-    },
-    date: {
-        type: DataTypes.DATE,
-        default: Date.now(),
-    }
+const PasswordResetCode = sequelize.define("PassowrdResetCode", {
+  uuid: {
+    type: Sequelize.UUID,
+    defaultValue: Sequelize.UUIDV1,
+    primaryKey: true,
+  },
+  code: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    default: "",
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    default: "",
+  },
+  date: {
+    type: DataTypes.DATE,
+    default: Date.now(),
+  },
 });
 
 module.exports = PasswordResetCode;
