@@ -14,22 +14,24 @@ app.use(express.json());
 app.use(cors());
 
 app.use(fileUpload({
-    createParentPath: true,
-    limits: {
-        fileSize: 8 * 1024 * 1024 * 1024 //8MB max file(s) size
-    },
+  createParentPath: true,
+  limits: {
+    fileSize: 8 * 1024 * 1024 * 1024 //8MB max file(s) size
+  },
 }));
 
 app.use('/api/auth/', authApi);
 app.use('/api/chat/', chatApi);
 
 db.sync()
-    .then(() => {
-        app.listen('5000', () => {
-            console.log('Listening on port 5000');
-        })
+  .then(() => {
+    app.listen('5000', () => {
+      console.log('Listening on port 5000');
     })
-    .catch(e => {
-        throw new Error(e);
-    })
+  })
+  .catch(e => {
+    throw new Error(e);
+  })
 
+
+module.exports = app;
