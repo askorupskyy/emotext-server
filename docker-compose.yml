@@ -5,7 +5,7 @@ services:
             - '5000:5000'
         build: .
         command: >
-            sh -c "npm run dev"
+            sh -c "npm run test && npm run dev"
         depends_on:
             - db
     db:
