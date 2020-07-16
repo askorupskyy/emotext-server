@@ -22,11 +22,6 @@ const Chat = sequelize.define("Chat", {
     allowNull: false,
     default: false,
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    default: "",
-  },
 });
 
 module.exports = Chat;
