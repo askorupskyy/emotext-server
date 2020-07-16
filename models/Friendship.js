@@ -2,10 +2,10 @@ const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
 const Friendship = sequelize.define("Friendship", {
-  uuid: {
+  id: {
+    primaryKey: true,
     type: Sequelize.UUID,
     defaultValue: Sequelize.UUIDV1,
-    primaryKey: true,
   },
   userOneId: {
     type: DataTypes.STRING,

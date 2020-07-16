@@ -2,10 +2,10 @@ const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
 const EmailVerificationCode = sequelize.define("EmailVerificationCode", {
-  uuid: {
+  id: {
+    primaryKey: true,
     type: Sequelize.UUID,
     defaultValue: Sequelize.UUIDV1,
-    primaryKey: true,
   },
   code: {
     type: DataTypes.STRING,

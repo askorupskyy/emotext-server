@@ -128,12 +128,12 @@ router.post("/signin/", async (req, res) => {
     }
     try {
       const newUserSession = await UserSession.create({
-        userId: user.uuid,
+        userId: user.id,
       });
       return res.status(200).send({
         success: true,
         message: "Signed In",
-        token: newUserSession.uuid,
+        token: newUserSession.id,
       });
     } catch (e) {
       return res.status(500).send({

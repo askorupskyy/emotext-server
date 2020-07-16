@@ -10,25 +10,18 @@ async function findUserByEmail(email) {
 }
 
 async function findUserSession(token) {
-  try {
-    let session = await UserSession.findOne({
-      where: { uuid: token, isDeleted: false },
-    });
-    console.log(session);
-    return session;
-  } catch (e) {
-    console.log(e);
-    return;
-  }
+  let session = await UserSession.findByPk(token);
+  if (session.isDeleted === true) return null;
+  return session;
 }
 
 async function findUserBySession(token) {
   const session = await findUserSession(token);
-  return await User.findOne({ where: { uuid: session.userId } });
+  return await User.findByPk(session.userId);
 }
 
 async function findUserByID(id) {
-  return await User.findOne({ uuid: id });
+  return await User.findByPk(id);
 }
 
 module.exports = {
