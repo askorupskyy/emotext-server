@@ -1,13 +1,24 @@
-version: "3"
+version: "3.4"
 services:
-  api:
-    ports:
-      - "5000:5000"
+  web-api:
     build: .
-    command: >
-      sh -c "npm run dev"
-    depends_on:
+    ports:
+      - 5000:5000
+    build: .
+    depends_on: 
       - db
+    command: > 
+      sh -c "npm run dev"
+
+  ml:
+    build: . 
+    ports:
+      - 8000:8000
+    depends_on: 
+      - db
+    command: >
+      sh -c "export FLASK_APP=./routes/api/machine-learning/app.py && pipenv run serve"
+
   db:
     image: postgres
     restart: always
@@ -18,7 +29,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: messaging-app
     ports:
-      - "5432:5432"
+      - 5432:5432
 
 volumes:
   db-data:
