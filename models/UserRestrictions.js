@@ -1,34 +1,38 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const Friendship = sequelize.define("Friendship", {
+const UserRestrictions = sequelize.define("UserRestrictions", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
     defaultValue: Sequelize.UUIDV1,
   },
-  userOneId: {
+  restrictedUserID: {
     type: DataTypes.STRING,
     allowNull: false,
     default: "",
   },
-  userTwoId: {
+  userID: {
     type: DataTypes.STRING,
     allowNull: false,
     default: "",
   },
-  didAccept: {
+  isMuted: {
     type: DataTypes.BOOLEAN,
     default: false,
   },
-  didBlock: {
+  isBlocked: {
     type: DataTypes.BOOLEAN,
     default: false,
   },
-  didMute: {
+  canCall: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    default: true,
+  },
+  canSendPics: {
+    type: DataTypes.BOOLEAN,
+    default: true,
   },
 });
 
-module.exports = Friendship;
+module.exports = UserRestrictions;
