@@ -1,36 +1,34 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const Message = sequelize.define("Message", {
+const FriendRequest = sequelize.define("FriendRequest", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
     defaultValue: Sequelize.UUIDV1,
   },
-  fromId: {
+  userFrom: {
     type: DataTypes.STRING,
     allowNull: false,
     default: "",
   },
-  text: {
+  userTo: {
     type: DataTypes.STRING,
     allowNull: false,
     default: "",
   },
-  isRead: {
+  didAccept: {
     type: DataTypes.BOOLEAN,
     default: false,
   },
-  chatId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    default: "",
-  },
-  isGroupChat: {
+  didReject: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    default: false,
+  },
+  didIgnore: {
+    type: DataTypes.BOOLEAN,
     default: false,
   },
 });
 
-module.exports = Message;
+module.exports = FriendRequest;
