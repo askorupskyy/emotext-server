@@ -63,6 +63,10 @@ const User = sequelize.define("User", {
     type: DataTypes.DATE,
     default: Date.now(),
   },
+  addToGroupChats: {
+    type: DataTypes.INTEGER,
+    default: 1,
+  },
 });
 
 module.exports = User;

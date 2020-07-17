@@ -1,14 +1,17 @@
 const express = require("express");
+const { Op } = require("sequelize");
 const router = express.Router();
 
 const Message = require("../../models/Message");
 const Chat = require("../../models/Chat");
 const User = require("../../models/User");
 const UserSession = require("../../models/UserSession");
+const UserRestrictions = require("../../models/UserRestrictions");
+const Contact = require("../../models/Contact");
 
 router.post("/send-message/", async (req, res, next) => {
   const { body } = req;
-  const { text, token, chatID } = body;
+  const { text, token, chatID, isGroupChat } = body;
 
   if (!text) {
     return res.status(401).send({
@@ -35,26 +38,61 @@ router.post("/send-message/", async (req, res, next) => {
     });
   }
 
-  const chat = await Chat.findByPk(chatID);
+  if (!isGroupChat) {
+    const chat = await Chat.findByPk(chatID);
 
-  if (!chat || chat.users.indexOf(user.id) === -1) {
-    return res.status(401).send({
-      success: false,
-      message: "Wrong Chat",
-    });
-  }
+    if (!chat || (chat.userOne !== user.id && chat.userTwo !== user.id)) {
+      return res.status(401).send({
+        success: false,
+        message: "Wrong Chat",
+      });
+    }
 
-  if (chat.users.length === 2) {
-    const userTwoID = chat.users[0] === user.id ? chat.users[1] : chat.users[0];
+    const userTwoID = chat.userOne === user.id ? chat.userTwo : chat.userOne;
     const userTwo = await User.findByPk(userTwoID);
-    //check if in contacts
-    //if not and if textMe is not available don't allow
-    //if in, but blocked then don't allow
-    //if in, but muted, don't send the notification
+
     if (userTwo.textMe === 2) {
       return res.status(401).send({
         success: false,
         message: "Users Privacy Settings Don't Allow You To Send Messages",
+      });
+    }
+
+    if (userTwo.textMe === 1) {
+      const contact = await Contact.findOne({
+        where: {
+          [Op.or]: [
+            {
+              [Op.and]: [{ userOneId: user.id }, { userTwoId: userTwo.id }],
+              [Op.and]: [{ userTwoId: user.id }, { userOneId: userTwo.id }],
+            },
+          ],
+        },
+      });
+      if (!contact) {
+        return res.status(401).send({
+          success: false,
+          message:
+            "users Privacy Settings Don't Allow Non-Contacts To Text Them",
+        });
+      }
+    }
+
+    const restrictions = await UserRestrictions.findOne({
+      where: {
+        [Op.or]: [
+          {
+            [Op.and]: [{ restrictedUserID: user.id }, { userID: userTwo.id }],
+            [Op.and]: [{ userID: user.id }, { restrictedUserID: userTwo.id }],
+          },
+        ],
+      },
+    });
+
+    if (restrictions.isBlocked) {
+      res.status(401).send({
+        success: false,
+        message: "The User Has Blocked You From Texting",
       });
     }
   }
@@ -63,7 +101,12 @@ router.post("/send-message/", async (req, res, next) => {
     chatId: chatID,
     from: user.id,
     text: text,
+    isGroupChat: isGroupChat,
   });
+
+  if (restrictions.isMuted) {
+    console.log("send no notification to the user");
+  }
 
   return res.status(200).send({
     success: true,
