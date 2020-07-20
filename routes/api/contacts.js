@@ -18,16 +18,25 @@ router.post("/send-friend-request/", async (req, res) => {
   if (!friendUser) {
     return res.status(404).send({
       success: false,
-      message: "A Person You Are Trying To Add Does Not Exist",
+      message: "A person you are trying to add does not exist",
     });
   }
 
   const session = await UserSession.findByPk(token);
 
-  if (!session) {
-    return res.status(404).send({
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
       success: false,
-      message: "Invalid Token",
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
     });
   }
 
@@ -66,7 +75,7 @@ router.post("/send-friend-request/", async (req, res) => {
   if (contact) {
     return res.status(401).send({
       success: false,
-      message: "You Are Already Friends With This User",
+      message: "You are already friends with this user",
     });
   }
 
@@ -84,7 +93,7 @@ router.post("/send-friend-request/", async (req, res) => {
   if (restrictions.isBlocked) {
     return res.status(401).send({
       success: false,
-      message: "This User Has Blocked You",
+      message: "This user has blocked you",
     });
   }
 
@@ -102,18 +111,18 @@ router.post("/send-friend-request/", async (req, res) => {
   if (restrictions.isBlocked) {
     return res.status(401).send({
       success: false,
-      message: "You Have Blocked This User",
+      message: "You have blocked this user",
     });
   }
 
-  const friendRequest = await FriendRequest.create({
+  await FriendRequest.create({
     userFrom: session.userId,
     userTo: friend,
   });
 
   return res.status(200).send({
     success: false,
-    message: "Friend Request Sent",
+    message: "Friend request sent",
   });
 });
 
@@ -123,10 +132,19 @@ router.post("/ignore-friend-request/", async (req, res) => {
 
   const session = await UserSession.findByPk(token);
 
-  if (!session) {
-    return res.status(404).send({
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
       success: false,
-      message: "Invalid Token",
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
     });
   }
 
@@ -135,7 +153,7 @@ router.post("/ignore-friend-request/", async (req, res) => {
   if (!fr) {
     return res.status(404).send({
       success: false,
-      message: "This Friend Request Does Not Exist",
+      message: "This friend request does not exist",
     });
   }
 
@@ -143,7 +161,7 @@ router.post("/ignore-friend-request/", async (req, res) => {
     return res.status(401).send({
       success: false,
       message:
-        "You Cannot Change The Status Of The Request Because You Are The One Who Sent It",
+        "You cannot change the status of the request because you are the one who sent it",
     });
   }
 
@@ -163,10 +181,19 @@ router.post("/decline-friend-request/", async (req, res) => {
 
   const session = await UserSession.findByPk(token);
 
-  if (!session) {
-    return res.status(404).send({
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
       success: false,
-      message: "Invalid Token",
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
     });
   }
 
@@ -175,7 +202,7 @@ router.post("/decline-friend-request/", async (req, res) => {
   if (!fr) {
     return res.status(404).send({
       success: false,
-      message: "This Friend Request Does Not Exist",
+      message: "This friend request does not exist",
     });
   }
 
@@ -183,7 +210,7 @@ router.post("/decline-friend-request/", async (req, res) => {
     return res.status(401).send({
       success: false,
       message:
-        "You Cannot Change The Status Of The Request Because You Are The One Who Sent It",
+        "You cannot change the status of the request because you are the one who sent it",
     });
   }
 
@@ -193,7 +220,7 @@ router.post("/decline-friend-request/", async (req, res) => {
 
   return res.status(200).send({
     success: true,
-    message: "Friend Request Rejected",
+    message: "Friend request rejected",
   });
 });
 
@@ -203,10 +230,19 @@ router.delete("/cancel-friend-request/", async (req, res) => {
 
   const session = await UserSession.findByPk(token);
 
-  if (!session) {
+  if (!session || session.isDeleted) {
     return res.status(404).send({
       success: false,
-      message: "Invalid Token",
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
     });
   }
 
@@ -215,7 +251,7 @@ router.delete("/cancel-friend-request/", async (req, res) => {
   if (!fr) {
     return res.status(404).send({
       success: false,
-      message: "This Friend Request Does Not Exist",
+      message: "This friend request does not exist",
     });
   }
 
@@ -223,7 +259,7 @@ router.delete("/cancel-friend-request/", async (req, res) => {
     return res.status(401).send({
       success: false,
       message:
-        "You Cannot Change The Status Of The Request Because You Are Not The One Who Sent It",
+        "You cannot change the status of the request because you are not the one who sent it",
     });
   }
 
@@ -231,7 +267,7 @@ router.delete("/cancel-friend-request/", async (req, res) => {
 
   return res.status(200).send({
     success: true,
-    message: "Friend Request Cancelled",
+    message: "Friend request cancelled",
   });
 });
 
@@ -241,10 +277,19 @@ router.post("/accept-friend-request/", async (req, res) => {
 
   const session = await UserSession.findByPk(token);
 
-  if (!session) {
-    return res.status(404).send({
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
       success: false,
-      message: "Invalid Token",
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
     });
   }
 
@@ -253,7 +298,7 @@ router.post("/accept-friend-request/", async (req, res) => {
   if (!fr) {
     return res.status(404).send({
       success: false,
-      message: "This Friend Request Does Not Exist",
+      message: "This friend request does not exist",
     });
   }
 
@@ -261,7 +306,7 @@ router.post("/accept-friend-request/", async (req, res) => {
     return res.status(401).send({
       success: false,
       message:
-        "You Cannot Change The Status Of The Request Because You Are The One Who Sent It",
+        "You cannot change the status of the request because you are the one who sent it",
     });
   }
 
@@ -282,7 +327,7 @@ router.post("/accept-friend-request/", async (req, res) => {
 
   return res.status(200).send({
     success: true,
-    message: "Friend Request Accepted",
+    message: "Friend request accepted",
   });
 });
 
@@ -295,10 +340,19 @@ router.put("/rename-friend/", async (req, res) => {
 
   const session = await UserSession.findByPk(token);
 
-  if (!session) {
-    return res.status(404).send({
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
       success: false,
-      message: "Invalid Session",
+      message: "Invalid session",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
     });
   }
 
@@ -319,13 +373,13 @@ router.put("/rename-friend/", async (req, res) => {
   } else {
     return res.status(401).send({
       success: false,
-      message: "You Are Not Friends With This Person",
+      message: "You are not friends with this person",
     });
   }
 
   return res.status(200).send({
     success: true,
-    message: "Friend Renamed",
+    message: "Friend renamed",
   });
 });
 
@@ -336,9 +390,18 @@ router.put("/delete-friend/", async (req, res) => {
   const session = await UserSession.findByPk(token);
 
   if (!session) {
-    return res.status(404).send({
+    return res.status(401).send({
       success: false,
-      message: "Invalid Session",
+      message: "Invalid session",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
     });
   }
 
@@ -350,7 +413,7 @@ router.put("/delete-friend/", async (req, res) => {
   ) {
     return res.status(401).send({
       success: false,
-      message: "You Are Not Friends With This Person",
+      message: "You are not friends with this person",
     });
   }
 
@@ -358,7 +421,7 @@ router.put("/delete-friend/", async (req, res) => {
 
   return res.status(200).send({
     success: true,
-    message: "Friend Deleted",
+    message: "Friend deleted",
   });
 });
 
