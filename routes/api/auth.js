@@ -121,7 +121,7 @@ router.get("/verify/", async (req, res) => {
   const { token } = query;
 
   const session = await UserSession.findByPk(token);
-  if (!session) {
+  if (!session || session.isDeleted) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -144,8 +144,9 @@ router.get("/verify/", async (req, res) => {
 router.get("/logout/", async (req, res) => {
   const { query } = req;
   const { token } = query;
+
   const session = await UserSession.findByPk(token);
-  if (!session) {
+  if (!session || session.isDeleted) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -161,13 +162,15 @@ router.get("/logout/", async (req, res) => {
 router.get("/get-user-by-token/", async (req, res) => {
   const { query } = req;
   const { token } = query;
+
   const session = await UserSession.findByPk(token);
-  if (!session) {
+  if (!session || session.isDeleted) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
+
   const user = await User.findByPk(session.userId);
   if (!user) {
     return res.status(401).send({
@@ -219,6 +222,7 @@ router.post("/get-reset-token/", async (req, res) => {
 router.get("/verify-reset-token/", async (req, res) => {
   const { query } = req;
   const { token } = query;
+
   const code = await PasswordResetCode.findByPk(token);
   if (!code) {
     return res.status(404).send({
@@ -228,7 +232,6 @@ router.get("/verify-reset-token/", async (req, res) => {
   } else {
     let codesDate = new Date(code.date).getTime();
     let currentDate = new Date().getTime();
-
     if (currentDate - codesDate > 600000) {
       return res.status(401).send({
         success: false,
@@ -245,6 +248,7 @@ router.get("/verify-reset-token/", async (req, res) => {
 router.post("/reset-password/", async (req, res) => {
   const { body } = req;
   const { token, password } = body;
+
   const code = await PasswordResetCode.findByPk(token);
   if (!code) {
     return res.status(404).send({
@@ -282,6 +286,7 @@ router.post("/reset-password/", async (req, res) => {
 router.get("/get-user-by-id/", async (req, res) => {
   const { query } = req;
   const { id } = query;
+
   const user = await User.findByPk(id);
   if (!user) {
     return res.status(404).send({
@@ -298,8 +303,9 @@ router.get("/get-user-by-id/", async (req, res) => {
 
 router.put("/change-bio/", async (req, res) => {
   const { token, bio } = req;
+
   const session = await UserSession.findByPk(token);
-  if (!session) {
+  if (!session || session.isDeleted) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -331,8 +337,9 @@ router.post("/update-profile-picture/", async (req, res) => {
     } else {
       const { token } = req.body;
       let avatar = req.files.profilePicture;
+
       const session = await UserSession.findByPk(token);
-      if (!session) {
+      if (!session || session.isDeleted) {
         return res.status(401).send({
           success: false,
           message: `Invalid token`,
@@ -366,13 +373,15 @@ router.post("/update-profile-picture/", async (req, res) => {
 
 router.put("/change-privacy-settings/", async (req, res) => {
   const { seeEmail, textMe, seeRealName, token } = req;
+
   const session = await UserSession.findByPk(token);
-  if (!session) {
+  if (!session || session.isDeleted) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
+
   const user = await User.findByPk(session.userId);
   if (!user) {
     return res.status(401).send({
@@ -380,6 +389,7 @@ router.put("/change-privacy-settings/", async (req, res) => {
       message: "Invalid token",
     });
   }
+
   user.seeEmail = seeEmail;
   user.textMe = textMe;
   user.seeRealName = seeRealName;
