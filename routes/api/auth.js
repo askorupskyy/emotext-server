@@ -119,9 +119,18 @@ router.post("/signin/", async (req, res) => {
 router.get("/verify/", async (req, res) => {
   const { query } = req;
   const { token } = query;
+
   const session = await UserSession.findByPk(token);
   if (!session) {
-    return res.status(404).send({
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+  if (!user) {
+    return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
@@ -161,14 +170,14 @@ router.get("/get-user-by-token/", async (req, res) => {
   }
   const user = await User.findByPk(session.userId);
   if (!user) {
-    return res.status(404).send({
+    return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
   return res.status(200).send({
     success: true,
-    message: "Success",
+    message: "User found",
     user: user,
   });
 });
@@ -202,7 +211,7 @@ router.post("/get-reset-token/", async (req, res) => {
       });
     return res.status(500).send({
       success: false,
-      message: "Server sror",
+      message: "Server error",
     });
   });
 });
@@ -223,12 +232,12 @@ router.get("/verify-reset-token/", async (req, res) => {
     if (currentDate - codesDate > 600000) {
       return res.status(401).send({
         success: false,
-        message: "Token expired.",
+        message: "Token expired",
       });
     }
     return res.status(200).send({
       success: true,
-      message: `Token valid.`,
+      message: "Token valid",
     });
   }
 });
@@ -277,7 +286,7 @@ router.get("/get-user-by-id/", async (req, res) => {
   if (!user) {
     return res.status(404).send({
       success: false,
-      message: "Incorrect ID",
+      message: "User not found",
     });
   }
   return res.status(200).send({
@@ -321,7 +330,6 @@ router.post("/update-profile-picture/", async (req, res) => {
       });
     } else {
       const { token } = req.body;
-
       let avatar = req.files.profilePicture;
       const session = await UserSession.findByPk(token);
       if (!session) {
@@ -333,9 +341,9 @@ router.post("/update-profile-picture/", async (req, res) => {
       let extension = avatar.substring(avatar.indexOf(".") + 1);
       const user = await User.findByPk(session.userId);
       if (!user) {
-        return res.status(404).send({
+        return res.status(401).send({
           success: false,
-          message: "Invalid Token",
+          message: "Invalid token",
         });
       }
       user.profilePictureURL = `../../media/profile-pictures/${userId}${extension}`;
@@ -356,18 +364,18 @@ router.post("/update-profile-picture/", async (req, res) => {
   }
 });
 
-router.put("/change-private-settings/", async (req, res) => {
+router.put("/change-privacy-settings/", async (req, res) => {
   const { seeEmail, textMe, seeRealName, token } = req;
   const session = await UserSession.findByPk(token);
   if (!session) {
-    return res.status(404).send({
+    return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
   const user = await User.findByPk(session.userId);
   if (!user) {
-    return res.status(404).send({
+    return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
