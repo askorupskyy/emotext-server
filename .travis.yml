@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "10"
+
+services: - docker
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
+
+script:
+  - docker-compose -f "docker-compose-ci.yml" run web-api-test
