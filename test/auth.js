@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 const user = {
   email: "testuser@mail.com",
-  password: "helloworld",
+  password: "HelloWorld123",
   name: "Test User",
   username: "testuser",
   authToken: "",
@@ -116,7 +116,7 @@ describe("Authentication", () => {
         .request(server)
         .get("/api/auth/logout")
         .query({
-          token: user.authToken + "bla",
+          token: user.authToken.substring(0, user.authToken.length - 1) + "a",
         })
         .end((err, result) => {
           result.should.have.status(401);

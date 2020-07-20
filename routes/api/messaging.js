@@ -16,157 +16,167 @@ router.post("/send-message/", async (req, res, next) => {
   if (!text) {
     return res.status(401).send({
       success: false,
-      message: "The Message Cannot Contain No Text",
+      message: "The message cannot contain no text",
     });
   }
 
-  const session = await UserSession.findByPk(token);
+  try {
+    const session = await UserSession.findByPk(token);
 
-  if (!session || session.isDeleted) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
-    });
-  }
-
-  const user = await User.findByPk(session.userID);
-
-  if (!user) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
-    });
-  }
-
-  if (!isGroupChat) {
-    const chat = await Chat.findByPk(chatID);
-
-    if (!chat || (chat.userOne !== user.id && chat.userTwo !== user.id)) {
-      return res.status(401).send({
+    if (!session || session.isDeleted) {
+      return res.status(404).send({
         success: false,
-        message: "Wrong Chat",
+        message: "Invalid token",
       });
     }
 
-    const userTwoID = chat.userOne === user.id ? chat.userTwo : chat.userOne;
-    const userTwo = await User.findByPk(userTwoID);
+    const user = await User.findByPk(session.userID);
 
-    if (userTwo.textMe === 2) {
-      return res.status(401).send({
+    if (!user) {
+      return res.status(404).send({
         success: false,
-        message: "Users Privacy Settings Don't Allow You To Send Messages",
+        message: "Invalid token",
       });
     }
 
-    if (userTwo.textMe === 1) {
-      const contact = await Contact.findOne({
+    if (!isGroupChat) {
+      const chat = await Chat.findByPk(chatID);
+
+      if (!chat || (chat.userOne !== user.id && chat.userTwo !== user.id)) {
+        return res.status(401).send({
+          success: false,
+          message: "Wrong chat",
+        });
+      }
+
+      const userTwoID = chat.userOne === user.id ? chat.userTwo : chat.userOne;
+      const userTwo = await User.findByPk(userTwoID);
+
+      if (userTwo.textMe === 2) {
+        return res.status(401).send({
+          success: false,
+          message: "Users privacy settings don't allow you to send messages",
+        });
+      }
+
+      if (userTwo.textMe === 1) {
+        const contact = await Contact.findOne({
+          where: {
+            [Op.or]: [
+              {
+                [Op.and]: [{ userOneId: user.id }, { userTwoId: userTwo.id }],
+                [Op.and]: [{ userTwoId: user.id }, { userOneId: userTwo.id }],
+              },
+            ],
+          },
+        });
+        if (!contact) {
+          return res.status(401).send({
+            success: false,
+            message:
+              "User's privacy settings don't allow non-contacts to text them",
+          });
+        }
+      }
+
+      const restrictions = await UserRestrictions.findOne({
         where: {
           [Op.or]: [
             {
-              [Op.and]: [{ userOneId: user.id }, { userTwoId: userTwo.id }],
-              [Op.and]: [{ userTwoId: user.id }, { userOneId: userTwo.id }],
+              [Op.and]: [{ restrictedUserID: user.id }, { userID: userTwo.id }],
+              [Op.and]: [{ userID: user.id }, { restrictedUserID: userTwo.id }],
             },
           ],
         },
       });
-      if (!contact) {
-        return res.status(401).send({
+
+      if (restrictions.isBlocked) {
+        res.status(401).send({
           success: false,
-          message:
-            "users Privacy Settings Don't Allow Non-Contacts To Text Them",
+          message: "The user has blocked you from texting",
         });
       }
     }
 
-    const restrictions = await UserRestrictions.findOne({
-      where: {
-        [Op.or]: [
-          {
-            [Op.and]: [{ restrictedUserID: user.id }, { userID: userTwo.id }],
-            [Op.and]: [{ userID: user.id }, { restrictedUserID: userTwo.id }],
-          },
-        ],
-      },
+    await Message.create({
+      chatId: chatID,
+      from: user.id,
+      text: text,
+      isGroupChat: isGroupChat,
     });
 
-    if (restrictions.isBlocked) {
-      res.status(401).send({
-        success: false,
-        message: "The User Has Blocked You From Texting",
-      });
+    if (restrictions.isMuted) {
+      console.log("send no notification to the user");
     }
+
+    return res.status(200).send({
+      success: true,
+      message: "Message Sent",
+    });
+  } catch {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
+    });
   }
-
-  await Message.create({
-    chatId: chatID,
-    from: user.id,
-    text: text,
-    isGroupChat: isGroupChat,
-  });
-
-  if (restrictions.isMuted) {
-    console.log("send no notification to the user");
-  }
-
-  return res.status(200).send({
-    success: true,
-    message: "Message Sent",
-  });
 });
 
 router.delete("/delete-message/", async (req, res) => {
   const { body } = req;
   const { token, chatID, messageID } = body;
 
-  const session = await UserSession.findByPk(token);
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(404).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
 
-  if (!session || session.isDeleted) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
+    const user = await User.findByPk(session.userID);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
+    const chat = await Chat.findByPk(chatID);
+    if (!chat || chat.users.indexOf(user.id) === -1) {
+      return res.status(401).send({
+        success: false,
+        message: "Wrong chat",
+      });
+    }
+
+    const message = await Message.findByPk(messageID);
+    if (!message) {
+      return res.status(404).send({
+        success: false,
+        message: "The message does not exist",
+      });
+    }
+
+    if (message.from !== user.id) {
+      return res.status(401).send({
+        success: false,
+        message: "Can't dlete other people's messages",
+      });
+    }
+
+    await message.destroy();
+
+    return res.status(200).send({
+      success: true,
+      message: "Message deleted",
     });
-  }
-
-  const user = await User.findByPk(session.userID);
-
-  if (!user) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
-    });
-  }
-
-  const chat = await Chat.findByPk(chatID);
-
-  if (!chat || chat.users.indexOf(user.id) === -1) {
+  } catch {
     return res.status(401).send({
       success: false,
-      message: "Wrong Chat",
+      message: "Invalid token",
     });
   }
-
-  const message = await Message.findByPk(messageID);
-
-  if (!message) {
-    return res.status(404).send({
-      success: false,
-      message: "The Message Does Not Exist",
-    });
-  }
-
-  if (message.from !== user.id) {
-    return res.status(401).send({
-      success: false,
-      message: "Can't Delete Other People's Messages",
-    });
-  }
-
-  await message.destroy();
-
-  return res.status(200).send({
-    success: true,
-    message: "Message Deleted",
-  });
 });
 
 router.put("/edit-message/", async (req, res) => {
@@ -176,61 +186,64 @@ router.put("/edit-message/", async (req, res) => {
   if (!text) {
     return res.status(401).send({
       success: false,
-      message: "Messages Can't By Empty",
+      message: "Messages can't by empty",
     });
   }
 
-  const session = await UserSession.findByPk(token);
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(404).send({
+        success: false,
+        message: "Invalid tken",
+      });
+    }
 
-  if (!session || session.isDeleted) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
+    const user = await User.findByPk(session.userID);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
+    const chat = await Chat.findByPk(chatID);
+    if (!chat || chat.users.indexOf(user.id) === -1) {
+      return res.status(401).send({
+        success: false,
+        message: "Wrong chat",
+      });
+    }
+
+    const message = await Message.findByPk(messageID);
+    if (!message) {
+      return res.status(404).send({
+        success: false,
+        message: "The message does not exist",
+      });
+    }
+
+    if (message.from !== user.id) {
+      return res.status(401).send({
+        success: false,
+        message: "Can't edit other people's messages",
+      });
+    }
+
+    message.text = text;
+
+    await message.save();
+
+    return res.status(200).send({
+      success: true,
+      message: "Message edited",
     });
-  }
-
-  const user = await User.findByPk(session.userID);
-
-  if (!user) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
-    });
-  }
-
-  const chat = await Chat.findByPk(chatID);
-
-  if (!chat || chat.users.indexOf(user.id) === -1) {
+  } catch {
     return res.status(401).send({
       success: false,
-      message: "Wrong Chat",
+      message: "Invalid token",
     });
   }
-
-  const message = await Message.findByPk(messageID);
-
-  if (!message) {
-    return res.status(404).send({
-      success: false,
-      message: "The Message Does Not Exist",
-    });
-  }
-
-  if (message.from !== user.id) {
-    return res.status(401).send({
-      success: false,
-      message: "Can't Edit Other People's Messages",
-    });
-  }
-
-  message.text = text;
-
-  await message.save();
-
-  return res.status(200).send({
-    success: true,
-    message: "Message Edited",
-  });
 });
 
 router.get("/search-message/", async (req, res) => {
@@ -240,48 +253,52 @@ router.get("/search-message/", async (req, res) => {
   if (!searchQuery) {
     return res.status(404).send({
       success: false,
-      message: "The Query Cannot Be Empty",
+      message: "The query cannot be empty",
     });
   }
 
-  const session = await UserSession.findByPk(token);
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(404).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
 
-  if (!session || session.isDeleted) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
+    const user = await User.findByPk(session.userID);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
+    const chat = await Chat.findByPk(chatID);
+    if (!chat || chat.users.indexOf(user.id) === -1) {
+      return res.status(401).send({
+        success: false,
+        message: "Wrong chat",
+      });
+    }
+
+    const messages = await Message.findAll({
+      where: {
+        text: {
+          [Op.like]: `%${searchQuery}%`,
+        },
+      },
     });
-  }
 
-  const user = await User.findByPk(session.userID);
-
-  if (!user) {
-    return res.status(404).send({
-      success: false,
-      message: "Invalid Token",
+    return res.status(200).send({
+      success: true,
+      message: "Messages found",
+      messages: messages,
     });
-  }
-
-  const chat = await Chat.findByPk(chatID);
-
-  if (!chat || chat.users.indexOf(user.id) === -1) {
+  } catch {
     return res.status(401).send({
       success: false,
-      message: "Wrong Chat",
+      message: "Invalid token",
     });
   }
-
-  const messages = await Message.findAll({
-    where: {
-      text: {
-        [Op.like]: `%${searchQuery}%`,
-      },
-    },
-  });
-
-  return res.status(200).send({
-    success: true,
-    message: "Messages Found",
-    messages: messages,
-  });
 });

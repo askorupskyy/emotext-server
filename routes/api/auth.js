@@ -73,7 +73,7 @@ router.post("/signup/", async (req, res) => {
   }
   await User.create({
     email: email,
-    password: password,
+    password: generateHash(password),
     name: name,
     username: username,
   });
@@ -100,12 +100,14 @@ router.post("/signin/", async (req, res) => {
       message: "User not found.",
     });
   }
+
   if (!validatePassword(password, user.password)) {
     return res.status(401).send({
       success: false,
       message: "Incorrect password.",
     });
   }
+
   const newUserSession = await UserSession.create({
     userId: user.id,
   });
@@ -145,44 +147,57 @@ router.get("/logout/", async (req, res) => {
   const { query } = req;
   const { token } = query;
 
-  const session = await UserSession.findByPk(token);
-  if (!session || session.isDeleted) {
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+    await session.update({ isDeleted: true });
+    return res.status(200).send({
+      success: true,
+      message: "Logged out",
+    });
+  } catch (e) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
-  await session.update({ isDeleted: true });
-  return res.status(200).send({
-    success: true,
-    message: "Logged out",
-  });
 });
 
 router.get("/get-user-by-token/", async (req, res) => {
   const { query } = req;
   const { token } = query;
 
-  const session = await UserSession.findByPk(token);
-  if (!session || session.isDeleted) {
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+    const user = await User.findByPk(session.userId);
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+    return res.status(200).send({
+      success: true,
+      message: "User found",
+      user: user,
+    });
+  } catch {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
-
-  const user = await User.findByPk(session.userId);
-  if (!user) {
-    return res.status(401).send({
-      success: false,
-      message: "Invalid token",
-    });
-  }
-  return res.status(200).send({
-    success: true,
-    message: "User found",
-    user: user,
-  });
 });
 
 router.post("/get-reset-token/", async (req, res) => {
@@ -287,44 +302,58 @@ router.get("/get-user-by-id/", async (req, res) => {
   const { query } = req;
   const { id } = query;
 
-  const user = await User.findByPk(id);
-  if (!user) {
-    return res.status(404).send({
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+    return res.status(200).send({
+      success: true,
+      message: "User found",
+      user: user,
+    });
+  } catch {
+    return res.status(401).send({
       success: false,
-      message: "User not found",
+      message: "Invalid ID",
     });
   }
-  return res.status(200).send({
-    success: true,
-    message: "User found",
-    user: user,
-  });
 });
 
 router.put("/change-bio/", async (req, res) => {
   const { token, bio } = req;
 
-  const session = await UserSession.findByPk(token);
-  if (!session || session.isDeleted) {
-    return res.status(401).send({
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+    const user = await User.findByPk(session.userId);
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid session",
+      });
+    }
+    await user.update({
+      bio: bio,
+    });
+    return res.status(200).send({
+      success: true,
+      message: "Bio updated",
+    });
+  } catch {
+    res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
-  const user = await User.findByPk(session.userId);
-  if (!user) {
-    return res.status(401).send({
-      success: false,
-      message: "Invalid session",
-    });
-  }
-  await user.update({
-    bio: bio,
-  });
-  return res.status(200).send({
-    success: true,
-    message: "Bio updated",
-  });
 });
 
 router.post("/update-profile-picture/", async (req, res) => {
@@ -338,30 +367,37 @@ router.post("/update-profile-picture/", async (req, res) => {
       const { token } = req.body;
       let avatar = req.files.profilePicture;
 
-      const session = await UserSession.findByPk(token);
-      if (!session || session.isDeleted) {
-        return res.status(401).send({
-          success: false,
-          message: `Invalid token`,
+      try {
+        const session = await UserSession.findByPk(token);
+        if (!session || session.isDeleted) {
+          return res.status(401).send({
+            success: false,
+            message: `Invalid token`,
+          });
+        }
+        let extension = avatar.substring(avatar.indexOf(".") + 1);
+        const user = await User.findByPk(session.userId);
+        if (!user) {
+          return res.status(401).send({
+            success: false,
+            message: "Invalid token",
+          });
+        }
+        user.profilePictureURL = `../../media/profile-pictures/${userId}${extension}`;
+
+        await user.save();
+
+        avatar.mv(`../../media/profile-pictures/`);
+        return res.status(200).send({
+          success: true,
+          message: "Picture updated",
         });
-      }
-      let extension = avatar.substring(avatar.indexOf(".") + 1);
-      const user = await User.findByPk(session.userId);
-      if (!user) {
+      } catch {
         return res.status(401).send({
           success: false,
           message: "Invalid token",
         });
       }
-      user.profilePictureURL = `../../media/profile-pictures/${userId}${extension}`;
-
-      await user.save();
-
-      avatar.mv(`../../media/profile-pictures/`);
-      return res.status(200).send({
-        success: true,
-        message: "Picture updated",
-      });
     }
   } catch (e) {
     return res.send({
@@ -374,30 +410,37 @@ router.post("/update-profile-picture/", async (req, res) => {
 router.put("/change-privacy-settings/", async (req, res) => {
   const { seeEmail, textMe, seeRealName, token } = req;
 
-  const session = await UserSession.findByPk(token);
-  if (!session || session.isDeleted) {
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
+    const user = await User.findByPk(session.userId);
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+
+    user.seeEmail = seeEmail;
+    user.textMe = textMe;
+    user.seeRealName = seeRealName;
+    await user.save();
+    return res.status(200).send({
+      success: true,
+      message: "Settings updated",
+    });
+  } catch {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
   }
-
-  const user = await User.findByPk(session.userId);
-  if (!user) {
-    return res.status(401).send({
-      success: false,
-      message: "Invalid token",
-    });
-  }
-
-  user.seeEmail = seeEmail;
-  user.textMe = textMe;
-  user.seeRealName = seeRealName;
-  await user.save();
-  return res.status(200).send({
-    success: true,
-    message: "Settings updated",
-  });
 });
 
 module.exports = router;
