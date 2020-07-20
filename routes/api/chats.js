@@ -7,7 +7,25 @@ const User = require("../../models/User");
 
 router.get("/load-chat/", async (req, res, next) => {
   const { query } = req;
-  const { chatId } = query;
+  const { chatId, token } = query;
+
+  const session = await UserSession.findByPk(token);
+
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
+    });
+  }
 
   const chat = await Chat.findByPk(chatId);
   if (!chat) {
@@ -17,9 +35,16 @@ router.get("/load-chat/", async (req, res, next) => {
     });
   }
 
+  if (!chat.userOne !== user.id || !chat.userTwo !== user.id) {
+    return res.status(401).send({
+      success: false,
+      message: "User is not in the chat",
+    });
+  }
+
   return res.status(200).send({
     success: true,
-    message: "Fetched Users",
+    message: "Users fetched",
     users: [chat.userOne, chat.userTwo],
   });
 });
@@ -27,25 +52,70 @@ router.get("/load-chat/", async (req, res, next) => {
 router.post("/create-chat/", async (req, res, next) => {
   const { body } = req;
   let { userTo, token } = body;
-  const user = await UserSession.findByPk(token);
-  if (!user) {
-    return res.status(404).send({
+
+  const session = await UserSession.findByPk(token);
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
       success: false,
-      message: "User Not Found",
+      message: "Invalid token",
     });
   }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
+    });
+  }
+
   const chat = await Chat.create({ userOne: user.id, userTwo: userTo });
   return res.status(200).send({
     success: true,
-    message: "Chat Created",
+    message: "Chat created",
     chat: chat,
   });
 });
 
 router.get("/load-messages/", async (req, res, next) => {
   const { query } = req;
-  const { part, chatId } = query;
+  const { part, chatId, token } = query;
   const limit = 25;
+
+  const session = await UserSession.findByPk(token);
+
+  if (!session || session.isDeleted) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
+    });
+  }
+
+  const user = await User.findByPk(session.userId);
+
+  if (!user) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token",
+    });
+  }
+
+  const chat = await Chat.findByPk(chatId);
+  if (!chat) {
+    return res.status(404).send({
+      success: false,
+      message: "Chat Not Found",
+    });
+  }
+
+  if (!chat.userOne !== user.id || !chat.userTwo !== user.id) {
+    return res.status(401).send({
+      success: false,
+      message: "User is not in the chat",
+    });
+  }
+
   const messages = await Message.findAll({
     offset: (part - 1) * limit,
     limit: limit,
@@ -54,12 +124,12 @@ router.get("/load-messages/", async (req, res, next) => {
   if (!messages) {
     return res.status(404).send({
       success: false,
-      message: "Chat Does Not Exist",
+      message: "Chat does not exist",
     });
   }
   return res.status(200).send({
     success: true,
-    message: "Messages Found",
+    message: "Messages found",
     messages: messages,
   });
 });
@@ -80,7 +150,7 @@ router.get("/load-chats/", async (req, res, next) => {
   const user = await User.findByPk(token);
 
   if (!user) {
-    return res.status(404).send({
+    return res.status(401).send({
       success: false,
       message: "Invalid token",
     });
@@ -103,7 +173,7 @@ router.get("/load-chats/", async (req, res, next) => {
 
   return res.status(200).send({
     success: true,
-    message: "Chats Loaded",
+    message: "Chats loaded",
     chats: chats,
   });
 });
