@@ -51,7 +51,7 @@ describe("Users", () => {
         .request(server)
         .get("/api/auth/verify")
         .query({
-          token: user.authToken,
+          token: user.authToken + "a",
         })
         .end((err, result) => {
           result.should.have.status(401);
@@ -81,7 +81,7 @@ describe("Users", () => {
         .request(server)
         .get("/api/auth/get-user-by-token")
         .query({
-          token: user.authToken,
+          token: user.authToken + "a",
         })
         .end((err, result) => {
           result.should.have.status(401);

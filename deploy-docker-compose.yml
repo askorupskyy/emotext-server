@@ -8,7 +8,7 @@ services:
     depends_on: 
       - db
     command: > 
-      sh -c "npm run start"
+      sh -c "npm run pm2"
 
   ml:
     build: . 
