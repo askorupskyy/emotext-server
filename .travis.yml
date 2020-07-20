@@ -14,8 +14,5 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
-before_script:
-  - docker-compose up -d --build
-
 script:
-  - docker-compose -f "docker-compose-ci.yml" run web-api-test
+  - docker-compose -f "docker-compose-ci.yml" run web-api-tests

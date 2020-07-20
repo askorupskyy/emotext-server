@@ -142,7 +142,8 @@ router.get("/verify/", async (req, res) => {
       success: true,
       message: "Valid",
     });
-  } catch{
+  }
+  catch{
     return res.status(401).send({
       success: false,
       message: "Invalid token"
