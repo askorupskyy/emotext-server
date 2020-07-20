@@ -223,7 +223,7 @@ router.post("/add-user/", async (req, res) => {
 
 router.delete("/delete-user/", async (req, res) => {
   const { body } = req;
-  const { token, user, chatID } = body;
+  const { token, userID, chatID } = body;
 
   const chat = await Chat.findByPk(chatID);
 
@@ -246,7 +246,7 @@ router.delete("/delete-user/", async (req, res) => {
   const user = await User.findByPk(session.userId);
 
   if (!user) {
-    return res.status(404).send({
+    return res.status(401).send({
       success: false,
       message: "Invalid token",
     });

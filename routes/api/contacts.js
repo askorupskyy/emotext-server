@@ -97,7 +97,7 @@ router.post("/send-friend-request/", async (req, res) => {
     });
   }
 
-  let restrictions = await UserRestrictions.findOne({
+  restrictions = await UserRestrictions.findOne({
     where: {
       [Op.and]: [
         {
@@ -334,9 +334,6 @@ router.post("/accept-friend-request/", async (req, res) => {
 router.put("/rename-friend/", async (req, res) => {
   const { body } = req;
   const { token, contactID, name } = body;
-
-  const { body } = req;
-  const { token, contactID } = body;
 
   const session = await UserSession.findByPk(token);
 
