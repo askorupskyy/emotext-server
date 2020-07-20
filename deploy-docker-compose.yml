@@ -8,13 +8,13 @@ services:
     depends_on: 
       - db
     command: > 
-      sh -c "npm run dev"
+      sh -c "npm run start"
 
   ml:
     build: . 
     ports:
       - 8000:8000
     depends_on: 
-      - db
+      - web-api
     command: >
       sh -c "export FLASK_APP=./routes/api/machine-learning/app.py && pipenv run serve"

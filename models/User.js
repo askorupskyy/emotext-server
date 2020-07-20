@@ -67,6 +67,7 @@ const User = sequelize.define("User", {
     type: DataTypes.INTEGER,
     default: 1,
   },
-});
+
+}, { freezeTableName: true });
 
 module.exports = User;

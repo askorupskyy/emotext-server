@@ -122,25 +122,32 @@ router.get("/verify/", async (req, res) => {
   const { query } = req;
   const { token } = query;
 
-  const session = await UserSession.findByPk(token);
-  if (!session || session.isDeleted) {
-    return res.status(401).send({
-      success: false,
-      message: "Invalid token",
-    });
-  }
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
 
-  const user = await User.findByPk(session.userId);
-  if (!user) {
+    const user = await User.findByPk(session.userId);
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      });
+    }
+    return res.status(200).send({
+      success: true,
+      message: "Valid",
+    });
+  } catch{
     return res.status(401).send({
       success: false,
-      message: "Invalid token",
-    });
+      message: "Invalid token"
+    })
   }
-  return res.status(200).send({
-    success: true,
-    message: "Valid",
-  });
 });
 
 router.get("/logout/", async (req, res) => {
@@ -217,7 +224,7 @@ router.post("/get-reset-token/", async (req, res) => {
     context: {
       url: `http://${HOST}:${3000}/auth/reset-password/?token=${
         resetCode.code
-      }`,
+        }`,
     },
   };
 
