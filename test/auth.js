@@ -7,13 +7,17 @@ chai.use(chaiHttp);
 
 const user = {
   email: "testuser@mail.com",
-  password: "helloworld",
+  password: "HelloWorld123",
   name: "Test User",
   username: "testuser",
   authToken: "",
 };
 
-describe("Authentication", () => {
+describe("Authentication", function () {
+  before(function (done) {
+    this.timeout(10000); // A very long environment setup.
+    setTimeout(done, 9500);
+  });
   describe("Sign Up", () => {
     it("should fail creating an account with a password that doesn't meet the requirements", (done) => {
       chai
@@ -104,8 +108,8 @@ describe("Authentication", () => {
         .end((err, result) => {
           result.should.have.status(200);
           result.body.success.should.be.eq(true);
-          result.should.have.property("token");
-          authToken = result.body.token;
+          result.body.should.have.property("token");
+          user.authToken = result.body.token;
           done();
         });
     });
@@ -116,7 +120,7 @@ describe("Authentication", () => {
         .request(server)
         .get("/api/auth/logout")
         .query({
-          token: user.authToken + "bla",
+          token: user.authToken.substring(0, user.authToken.length - 1) + "a",
         })
         .end((err, result) => {
           result.should.have.status(401);

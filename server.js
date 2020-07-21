@@ -5,6 +5,8 @@ const fileUpload = require("express-fileupload");
 
 const authApi = require("./routes/api/auth");
 const chatApi = require("./routes/api/chats");
+const contactsApi = require("./routes/api/contacts");
+const groupChatsApi = require("./routes/api/groupChats");
 
 const db = require("./util/db");
 
@@ -24,10 +26,13 @@ app.use(
 
 app.use("/api/auth/", authApi);
 app.use("/api/chat/", chatApi);
+app.use("/api/contacts/", contactsApi);
+app.use("/api/groupchats/", groupChatsApi);
 
 db.sync({ force: true })
   .then(() => {
     app.listen("5000", () => {
+
       console.log("Listening on port 5000");
     });
   })

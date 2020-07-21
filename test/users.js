@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 const user = {
   email: "testuser@mail.com",
-  password: "helloworld",
+  password: "HelloWorld123",
   name: "Test User",
   username: "testuser",
   authToken: "",
@@ -15,16 +15,18 @@ const user = {
 
 describe("Users", () => {
   describe("Log In", () => {
-    it("should log in a user to get a token", (done) => {
+    it("should log in the user and return a token", (done) => {
       chai
-        .request(request)
-        .post({
+        .request(server)
+        .post("/api/auth/signin")
+        .send({
           email: user.email,
           password: user.password,
         })
         .end((err, result) => {
           result.should.have.status(200);
           result.body.success.should.be.eq(true);
+          result.body.should.have.property("token");
           user.authToken = result.body.token;
           done();
         });
@@ -44,15 +46,15 @@ describe("Users", () => {
           done();
         });
     });
-    it("should return 404 because the session with given token does not exist", (done) => {
+    it("should return 401 because the session with given token does not exist", (done) => {
       chai
         .request(server)
         .get("/api/auth/verify")
         .query({
-          token: user.authToken,
+          token: user.authToken + "a",
         })
         .end((err, result) => {
-          result.should.have.status(404);
+          result.should.have.status(401);
           result.body.success.should.be.eq(false);
           done();
         });
@@ -79,15 +81,13 @@ describe("Users", () => {
         .request(server)
         .get("/api/auth/get-user-by-token")
         .query({
-          token: user.authToken,
+          token: user.authToken + "a",
         })
         .end((err, result) => {
-          result.should.have.status(404);
+          result.should.have.status(401);
           result.body.success.should.be.eq(false);
           done();
         });
     });
   });
-
-  describe("");
 });

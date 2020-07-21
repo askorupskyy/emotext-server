@@ -1,36 +1,36 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const Message = sequelize.define("Message", {
+const Chat = sequelize.define("Chat", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
     defaultValue: Sequelize.UUIDV1,
   },
-  fromId: {
-    type: DataTypes.STRING,
+  users: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
-    default: "",
   },
-  text: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    default: "",
-  },
-  isRead: {
-    type: DataTypes.BOOLEAN,
-    default: false,
-  },
-  chatId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    default: "",
-  },
-  isGroupChat: {
+  isDeleted: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     default: false,
+  },
+  creator: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    default: "",
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    default: "",
+  },
+  admins: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: false,
+    default: [],
   },
 });
 
-module.exports = Message;
+module.exports = Chat;

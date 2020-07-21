@@ -34,7 +34,7 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     default: false,
   },
-  userName: {
+  username: {
     type: DataTypes.STRING,
     allowNull: false,
     default: "",
@@ -63,6 +63,11 @@ const User = sequelize.define("User", {
     type: DataTypes.DATE,
     default: Date.now(),
   },
-});
+  addToGroupChats: {
+    type: DataTypes.INTEGER,
+    default: 1,
+  },
+
+}, { freezeTableName: true });
 
 module.exports = User;
