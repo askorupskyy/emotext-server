@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { Op } = require("sequelize");
 
 const Chat = require("../../models/Chat");
 const UserSession = require("../../models/UserSession");
@@ -77,13 +78,31 @@ router.post("/create-chat/", async (req, res, next) => {
       });
     }
 
-    const chat = await Chat.create({ userOne: user.id, userTwo: userTo });
+    const userTwo = await User.findByPk(userTo);
+
+    if (!userTwo) {
+      return res.status(404).send({
+        success: false,
+        message: "The user you want to text does not exist",
+      });
+    }
+
+    let chat = await Chat.findOne({ where: { [Op.or]: [{ userOne: user.id, userTwo: userTo }, { userOne: userTo, userTwo: user.id }] } })
+    if (chat) {
+      return res.status(401).send({
+        success: false,
+        message: "You already have a chat with this user"
+      })
+    }
+
+    chat = await Chat.create({ userOne: user.id, userTwo: userTo });
     return res.status(200).send({
       success: true,
       message: "Chat created",
       chat: chat,
     });
-  } catch {
+
+  } catch (e) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
