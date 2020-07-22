@@ -332,7 +332,7 @@ router.get("/get-user-by-id/", async (req, res) => {
 });
 
 router.post("/change-bio/", async (req, res) => {
-  const { req } = req;
+  const { body } = req;
   const { token, bio } = body;
 
   try {
