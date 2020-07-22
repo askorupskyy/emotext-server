@@ -162,7 +162,7 @@ describe("Users", () => {
         .end((err, result) => {
           result.should.have.status(200);
           result.body.success.should.be.eq(true);
-          result.body.user.bio.should.be("Hello World!");
+          result.body.user.bio.should.be.eq("Hello World!");
           done();
         });
     })
@@ -181,7 +181,8 @@ describe("Users", () => {
     })
     it("should change the user's privacy settings", (done) => {
       chai
-        .request("/api/auth/change-privacy-settings")
+        .request(server)
+        .post("/api/auth/change-privacy-settings")
         .send({
           token: user.authToken,
           seeEmail: 2,
@@ -191,6 +192,7 @@ describe("Users", () => {
         .end((err, result) => {
           result.should.have.status(200);
           result.body.success.should.be.eq(true);
+          done();
         })
     })
     it("should confirm that the settings were changed", (done) => {
@@ -203,9 +205,9 @@ describe("Users", () => {
         .end((err, result) => {
           result.should.have.status(200);
           result.body.success.should.be.eq(true);
-          result.body.user.seeEmail.should.be(2);
-          result.body.user.textMe.should.be(2);
-          result.body.user.seeRealName.should.be(2);
+          result.body.user.seeEmail.should.be.eq(2);
+          result.body.user.textMe.should.be.eq(2);
+          result.body.user.seeRealName.should.be.eq(2);
           done();
         });
     })
@@ -229,7 +231,7 @@ describe("Users", () => {
     it("should logout the user", (done) => {
       chai
         .request(server)
-        .get("/api/auth/get-user-by-id")
+        .get("/api/auth/logout")
         .query({
           token: user.authToken,
         })
