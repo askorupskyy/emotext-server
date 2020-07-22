@@ -352,7 +352,7 @@ router.post("/accept-friend-request/", async (req, res) => {
   }
 });
 
-router.put("/rename-friend/", async (req, res) => {
+router.post("/rename-friend/", async (req, res) => {
   const { body } = req;
   const { token, contactID, name } = body;
 
@@ -405,7 +405,7 @@ router.put("/rename-friend/", async (req, res) => {
   }
 });
 
-router.put("/delete-friend/", async (req, res) => {
+router.post("/delete-friend/", async (req, res) => {
   const { body } = req;
   const { token, contactID } = body;
 
