@@ -40,35 +40,35 @@ router.post("/send-friend-request/", async (req, res) => {
 
     const fr = await FriendRequest.findOne({
       where: {
-        [Op.and]: [
+        [Op.or]: [
           {
-            [Op.or]: [{ userFrom: session.userId }, { userTo: session.userId }],
-            [Op.or]: [{ userFrom: friend }, { userTo: friend }],
+            [Op.and]: [{ userFrom: session.userId }, { userTo: friend }],
+            [Op.and]: [{ userFrom: friend }, { userTo: session.userId }],
           },
         ],
+        didReject: false,
       },
     });
 
     if (fr) {
       return res.status(401).send({
         success: false,
-        message: "A Friend Request Already Exists",
+        message: "A friend request aready exists",
       });
     }
 
-    const contact = await FriendRequest.findOne({
+    const contact = await Contact.findOne({
       where: {
-        [Op.and]: [
-          {
-            [Op.or]: [
-              { userOneId: session.userId },
-              { userTwoId: session.userId },
-            ],
-            [Op.or]: [{ userOneId: friend }, { userTo: friend }],
-          },
-        ],
-      },
-    });
+        [Op.or]: [{
+          userOneId: user.id,
+          userTwoId: friend,
+        },
+        {
+          userOneId: friend,
+          userTwoId: user.id,
+        }]
+      }
+    })
 
     if (contact) {
       return res.status(401).send({
@@ -88,7 +88,7 @@ router.post("/send-friend-request/", async (req, res) => {
       },
     });
 
-    if (restrictions.isBlocked) {
+    if (restrictions && restrictions.isBlocked) {
       return res.status(401).send({
         success: false,
         message: "This user has blocked you",
@@ -106,7 +106,7 @@ router.post("/send-friend-request/", async (req, res) => {
       },
     });
 
-    if (restrictions.isBlocked) {
+    if (restrictions && restrictions.isBlocked) {
       return res.status(401).send({
         success: false,
         message: "You have blocked this user",
@@ -119,10 +119,10 @@ router.post("/send-friend-request/", async (req, res) => {
     });
 
     return res.status(200).send({
-      success: false,
+      success: true,
       message: "Friend request sent",
     });
-  } catch {
+  } catch (e) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -229,7 +229,9 @@ router.post("/decline-friend-request/", async (req, res) => {
       success: true,
       message: "Friend request rejected",
     });
-  } catch {
+  } catch (e) {
+    console.log("there")
+    console.log(e);
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -297,7 +299,7 @@ router.post("/accept-friend-request/", async (req, res) => {
     if (!session || session.isDeleted) {
       return res.status(401).send({
         success: false,
-        message: "Invalid token",
+        message: "Invalid TToken",
       });
     }
 
@@ -305,7 +307,7 @@ router.post("/accept-friend-request/", async (req, res) => {
     if (!user) {
       return res.status(401).send({
         success: false,
-        message: "Invalid token",
+        message: "Invalid Token",
       });
     }
 
@@ -344,7 +346,7 @@ router.post("/accept-friend-request/", async (req, res) => {
       success: true,
       message: "Friend request accepted",
     });
-  } catch {
+  } catch (e) {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -354,7 +356,7 @@ router.post("/accept-friend-request/", async (req, res) => {
 
 router.post("/rename-friend/", async (req, res) => {
   const { body } = req;
-  const { token, contactID, name } = body;
+  const { token, friendID, name } = body;
 
   try {
     const session = await UserSession.findByPk(token);
@@ -373,11 +375,23 @@ router.post("/rename-friend/", async (req, res) => {
       });
     }
 
-    const contact = await Contact.findByPk(contactID);
-    if (
-      contact.userOneId !== session.userId &&
-      contact.userTwoId !== session.userId
-    ) {
+    const contact = await Contact.findOne({
+      where: {
+        [Op.or]: [{
+          userOneId: user.id,
+          userTwoId: friendID
+        }, {
+          userTwoId: user.id,
+          userOneId: friendID
+        }]
+      }
+    });
+
+    if (!contact) {
+      return res.status(401).send({
+        success: false,
+        message: "You are not friends with this person"
+      })
     }
 
     if (contact.userOneId === session.userId) {
@@ -407,7 +421,7 @@ router.post("/rename-friend/", async (req, res) => {
 
 router.post("/delete-friend/", async (req, res) => {
   const { body } = req;
-  const { token, contactID } = body;
+  const { token, friendID } = body;
 
   try {
     const session = await UserSession.findByPk(token);
@@ -426,15 +440,23 @@ router.post("/delete-friend/", async (req, res) => {
       });
     }
 
-    const contact = await Contact.findByPk(contactID);
-    if (
-      contact.userOneId !== session.userId &&
-      contact.userTwoId !== session.userId
-    ) {
+    const contact = await Contact.findOne({
+      where: {
+        [Op.or]: [{
+          userOneId: user.id,
+          userTwoId: friendID
+        }, {
+          userTwoId: user.id,
+          userOneId: friendID
+        }]
+      }
+    });
+
+    if (!contact) {
       return res.status(401).send({
         success: false,
-        message: "You are not friends with this person",
-      });
+        message: "You are not friends with this person"
+      })
     }
 
     await contact.destroy();
@@ -450,5 +472,97 @@ router.post("/delete-friend/", async (req, res) => {
     });
   }
 });
+
+router.get("/get-friend-requests/", async (req, res) => {
+  const { query } = req;
+  const { token } = query;
+
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      })
+    }
+
+    const user = await User.findByPk(session.userId);
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      })
+    }
+
+    const requests = await FriendRequest.findAll({
+      where: {
+        [Op.or]: [{
+          userFrom: user.id,
+        },
+        {
+          userTo: user.id,
+        }]
+      }
+    })
+
+    return res.status(200).send({
+      success: true,
+      message: "Contacts fetched",
+      requests: requests,
+    })
+  }
+  catch (e) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token"
+    })
+  }
+})
+
+router.get("/get-contacts/", async (req, res) => {
+  const { query } = req;
+  const { token } = query;
+
+  try {
+    const session = await UserSession.findByPk(token);
+    if (!session || session.isDeleted) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      })
+    }
+
+    const user = await User.findByPk(session.userId);
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid token",
+      })
+    }
+
+    const contacts = await Contact.findAll({
+      where: {
+        [Op.or]: [{
+          userOneId: user.id,
+        },
+        {
+          userTwoId: user.id,
+        }]
+      }
+    })
+
+    return res.status(200).send({
+      success: true,
+      message: "Contacts fetched",
+      contacts: contacts,
+    })
+  }
+  catch (e) {
+    return res.status(401).send({
+      success: false,
+      message: "Invalid token"
+    })
+  }
+})
 
 module.exports = router;
