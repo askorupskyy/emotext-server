@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const Message = sequelize.define("Message", {
+const Message = sequelize.define("message", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -31,6 +31,6 @@ const Message = sequelize.define("Message", {
     allowNull: false,
     default: false,
   },
-});
+}, { freezeTableName: true });
 
 module.exports = Message;

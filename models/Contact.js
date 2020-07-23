@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const Contact = sequelize.define("Contact", {
+const Contact = sequelize.define("contact", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -25,6 +25,6 @@ const Contact = sequelize.define("Contact", {
     type: DataTypes.STRING,
     default: "",
   },
-});
+}, { freezeTableName: true });
 
 module.exports = Contact;

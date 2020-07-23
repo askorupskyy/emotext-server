@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const UserSession = sequelize.define("UserSession", {
+const UserSession = sequelize.define("userSession", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -20,6 +20,6 @@ const UserSession = sequelize.define("UserSession", {
     type: DataTypes.BOOLEAN,
     default: false,
   },
-});
+}, { freezeTableName: true });
 
 module.exports = UserSession;
