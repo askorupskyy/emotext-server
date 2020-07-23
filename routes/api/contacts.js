@@ -230,8 +230,6 @@ router.post("/decline-friend-request/", async (req, res) => {
       message: "Friend request rejected",
     });
   } catch (e) {
-    console.log("there")
-    console.log(e);
     return res.status(401).send({
       success: false,
       message: "Invalid token",
