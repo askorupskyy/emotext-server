@@ -331,8 +331,9 @@ router.get("/get-user-by-id/", async (req, res) => {
   }
 });
 
-router.put("/change-bio/", async (req, res) => {
-  const { token, bio } = req;
+router.post("/change-bio/", async (req, res) => {
+  const { body } = req;
+  const { token, bio } = body;
 
   try {
     const session = await UserSession.findByPk(token);
@@ -415,9 +416,9 @@ router.post("/update-profile-picture/", async (req, res) => {
   }
 });
 
-router.put("/change-privacy-settings/", async (req, res) => {
-  const { seeEmail, textMe, seeRealName, token } = req;
-
+router.post("/change-privacy-settings/", async (req, res) => {
+  const { body } = req;
+  const { seeEmail, textMe, seeRealName, token } = body;
   try {
     const session = await UserSession.findByPk(token);
     if (!session || session.isDeleted) {

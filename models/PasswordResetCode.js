@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const PasswordResetCode = sequelize.define("PassowrdResetCode", {
+const PasswordResetCode = sequelize.define("PasswordResetCode", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -21,6 +21,6 @@ const PasswordResetCode = sequelize.define("PassowrdResetCode", {
     type: DataTypes.DATE,
     default: Date.now(),
   },
-});
+}, { freezeTableName: true });
 
 module.exports = PasswordResetCode;

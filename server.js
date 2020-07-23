@@ -29,10 +29,9 @@ app.use("/api/chat/", chatApi);
 app.use("/api/contacts/", contactsApi);
 app.use("/api/groupchats/", groupChatsApi);
 
-db.sync({ force: true })
+db.sync({ force: process.env.CI == "true" })
   .then(() => {
     app.listen("5000", () => {
-
       console.log("Listening on port 5000");
     });
   })

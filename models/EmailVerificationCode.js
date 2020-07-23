@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const EmailVerificationCode = sequelize.define("EmailVerificationCode", {
+const EmailVerificationCode = sequelize.define("emailVerificationCode", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -21,6 +21,6 @@ const EmailVerificationCode = sequelize.define("EmailVerificationCode", {
     type: DataTypes.DATE,
     default: Date.now(),
   },
-});
+}, { freezeTableName: true });
 
 module.exports = EmailVerificationCode;

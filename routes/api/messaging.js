@@ -179,7 +179,7 @@ router.delete("/delete-message/", async (req, res) => {
   }
 });
 
-router.put("/edit-message/", async (req, res) => {
+router.post("/edit-message/", async (req, res) => {
   const { body } = req;
   const { token, chatID, messageID, text } = body;
 

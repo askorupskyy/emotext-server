@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const FriendRequest = sequelize.define("FriendRequest", {
+const FriendRequest = sequelize.define("friendRequest", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -29,6 +29,6 @@ const FriendRequest = sequelize.define("FriendRequest", {
     type: DataTypes.BOOLEAN,
     default: false,
   },
-});
+}, { freezeTableName: true });
 
 module.exports = FriendRequest;

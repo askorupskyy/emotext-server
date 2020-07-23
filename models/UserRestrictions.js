@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const UserRestrictions = sequelize.define("UserRestrictions", {
+const UserRestrictions = sequelize.define("userRestrictions", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -33,6 +33,6 @@ const UserRestrictions = sequelize.define("UserRestrictions", {
     type: DataTypes.BOOLEAN,
     default: true,
   },
-});
+}, { freezeTableName: true });
 
 module.exports = UserRestrictions;

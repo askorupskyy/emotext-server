@@ -285,7 +285,7 @@ router.delete("/delete-user/", async (req, res) => {
   }
 });
 
-router.put("/rename-group/", async (req, res) => {
+router.post("/rename-group/", async (req, res) => {
   const { body } = req;
   const { token, name, chatID } = body;
 
@@ -337,7 +337,7 @@ router.put("/rename-group/", async (req, res) => {
   }
 });
 
-router.put("/change-chat-picture/", async (req, res) => {
+router.post("/change-chat-picture/", async (req, res) => {
   const { body } = req;
   const { token, picture, chatID } = body;
 

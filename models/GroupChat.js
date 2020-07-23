@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const Chat = sequelize.define("Chat", {
+const GroupChat = sequelize.define("groupChat", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -31,6 +31,6 @@ const Chat = sequelize.define("Chat", {
     allowNull: false,
     default: [],
   },
-});
+}, { freezeTableName: true });
 
-module.exports = Chat;
+module.exports = GroupChat;

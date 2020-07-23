@@ -1,7 +1,7 @@
 const sequelize = require("../util/db");
 const { DataTypes, Sequelize } = require("sequelize");
 
-const Chat = sequelize.define("Chat", {
+const Chat = sequelize.define("chat", {
   id: {
     primaryKey: true,
     type: Sequelize.UUID,
@@ -19,9 +19,8 @@ const Chat = sequelize.define("Chat", {
   },
   isDeleted: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
     default: false,
   },
-});
+}, { freezeTableName: true });
 
 module.exports = Chat;
