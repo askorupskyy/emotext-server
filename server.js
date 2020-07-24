@@ -41,3 +41,5 @@ db.sync({ force: process.env.CI == "true" })
   .catch((e) => {
     throw new Error(e);
   });
+
+module.exports = app;
