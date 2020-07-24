@@ -4,6 +4,7 @@ services:
     build: .
     ports:
       - 5000:5000
+      - 8900:8900
     build: .
     depends_on: 
       - db
