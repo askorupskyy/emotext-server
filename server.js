@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
+const io = require('socket.io')(8900);
 
 const authApi = require("./routes/api/auth");
 const chatApi = require("./routes/api/chats");
@@ -9,6 +10,8 @@ const contactsApi = require("./routes/api/contacts");
 const groupChatsApi = require("./routes/api/groupChats");
 
 const db = require("./util/db");
+
+const sockets = require("./routes/sockets")(io);
 
 app.use(express.urlencoded());
 app.use(express.json());
@@ -38,5 +41,3 @@ db.sync({ force: process.env.CI == "true" })
   .catch((e) => {
     throw new Error(e);
   });
-
-module.exports = app;
