@@ -3,6 +3,7 @@ const path = require("path");
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars");
 const { Op } = require("sequelize");
+const path = require("path");
 
 const UserSession = require("../../models/UserSession");
 const PasswordResetCode = require("../../models/PasswordResetCode");
@@ -385,6 +386,13 @@ router.post("/update-profile-picture/", async (req, res) => {
           });
         }
         let extension = avatar.substring(avatar.indexOf(".") + 1);
+        if (extension.indexOf("jpeg") == -1 || extension.indexOf("png") == -1) {
+          return res.status(401).send({
+            success: false,
+            message: "Please upload a file in a supported file format"
+          })
+        }
+
         const user = await User.findByPk(session.userId);
         if (!user) {
           return res.status(401).send({
