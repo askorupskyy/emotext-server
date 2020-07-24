@@ -3,7 +3,6 @@ const path = require("path");
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars");
 const { Op } = require("sequelize");
-const path = require("path");
 
 const UserSession = require("../../models/UserSession");
 const PasswordResetCode = require("../../models/PasswordResetCode");
