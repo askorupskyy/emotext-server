@@ -1,6 +1,6 @@
-# messaging-app
+# Messaging App API
 
-# Testing and Front-End Dev Environment
+# Dev Environment
 
 Make sure **Docker** is installed on your computer and that you have an account in it.
 
@@ -10,9 +10,25 @@ Run the `docker-compose build` and `docker-compose up` commands to run the proje
 
 Run the `docker-compose down` command to close the project.
 
+# Production Environment
+
+Currenly implemented with **Docker** but really easy to run.
+
+Use `docker-compose -f "deploy-docker-compose.yml" build` and `docker-compose -f "deploy-docker-compose.yml" up` to run the deploy enviroment.
+
+**TODO: setup Nginx**
+
 **The server and the database will always be running unless you use the command to close it**
 
 The following commands are responsible for testing, installing, and starting the project **both on Node and Python**
+
+# Testing Enviroment
+
+Use `docker-compose -f "docker-compose-ci.yml" build` and `docker-compose -f "docker-compose-ci.yml" up` to run the tests for the **Node** server.
+
+# Database Tables
+
+**CHECK THE MODELS FOLDER TO SEE THE STRUCTURE OF THE OBJECTS THAT WILL BE RETURNED BY THE API**
 
 # API response structure
 
@@ -34,72 +50,61 @@ If not, then the message will tell you why.
 
 # API docs
 
-[Auth - users and authentication](#auth)
+[Auth - users and authentication](#auth) – TESTED
 
-[Chats - messaging and chats](#chat)
+[Contacts](#contacts) – TESTED
 
-[Friendships](#friendships)
+[Chats - and chats](#chat) – TESTED
 
-[Media](#media)
+[Messaging](#messaging)
+
+[Group Chats](#groups)
 
 ## Auth
 
-[Login](#login) - Done and Tested
+[Signup](#signup)
 
-[Logout](#logout) - Done and Tested
+[Signin](#signin)
 
-[Signup](#signup) - Done and Tested
+[Verify Token](#verify)
 
-[Verify User Session Token](#verify-token) - Done and Tested
+[Logout](#logout)
 
-[Profile Picture Change](#profile-pic) - Not Coded Yet
+[Get User By Token](#get-user-by-token)
 
-[Profile Bio Change](#profile-bio-change) - Not Coded Yet
+[Get Reset Token](#get-reset-token)
 
-[Get Password Reset Token](#get-reset-token) - Done
+[Verify Reset Token](#verify-reset-token)
 
-[Verify Reset Token](#verify-reset-token) - Done
+[Reset Password](#reset-password)
 
-[Password Reset](#reset-password) - Done and Tested
+[Get User By ID](#get-user-by-id)
 
-[Get User By ID](#get-user-by-id) - Done and Tested
+[Change Bio](#change-bio)
 
-[Get User By Token](#get-user-by-token) - Done and Tested
+[Update Profile Picture](#update-profile-picture)
 
+[Change Privacy Settings](#change-privacy-settings)
 
-## Chat
+## Contacts 
 
-[Send Message](#send-message) - Done and Tested
+[Send Friend Request](#send-friend-request)
 
-[Load chat info](#load-chat-info) - Done and Tested
+[Ignore Friend Request](#ignore-friend-request)
 
-[Create a Chat](#create-chat) - Done and Tested (Planning to remove and find an alternative)
+[Decline Friend Request](#decline-friend-request)
 
-[Load Messages](#load-messages) - Done
+[Cancel Friend Request](#cancel-friend-request)
 
-[Load Chats](#load-chats) - Done and Tested
+[Accept Friend Request](#accept-friend-request)
 
+[Rename Contacts](#rename-contacts)
 
-### Login
+[Delete Contact](#delete-contacts)
 
-Request URL `http://{our_ip}:5000/api/auth/signin/`
+[Get Friend Requests](#get-friend-requests)
 
-Method - **POST**
-
-Accepts an **email** and a **password** in the body.
-
-Returns a user session token,
-
-which should be stored in the device/browser to identify the user AND to keep him signed in.
-
-
-### Logout
-
-Request URL `http://{our_ip}:5000/api/auth/logout/`
-
-Method - **GET**
-
-Accepts a user session token in the query, which could be retreived from the device memory.
+[Get Contacts](#get-contacts)
 
 
 ### Signup
@@ -108,175 +113,143 @@ Request URL `http://{our_ip}:5000/api/auth/signup/`
 
 Method - **POST**
 
-Accepts **firstName**, **lastName**, an **email**, and a **password** in the body.
+Accepts a **name**, a **username**, an **email** and a **password** in the body.
+
+Creates an account, later a user should be redirected to the login page to login or he should be logged in using another API call.
 
 
-### Verify Token
+### Signin
+
+Request URL `http://{our_ip}:5000/api/auth/signin/`
+
+Method - **POST**
+
+Accepts an **email** and a **password** in the body.
+
+**An email can either be a username or an email, it's just a field name**
+
+Returns a user session token,
+
+which should be stored in the device/browser to identify the user AND to keep him signed in.
+
+
+### Verify
 
 Request URL `http://{our_ip}:5000/api/auth/verify/`
 
 Method - **GET**
 
-Accepts the **token** in the query.
+Accepts an authentication **token** in the query.
 
-Will be used to check if the current session is valid and if is not, throw the client back to the login page.
+Returns whether the token is valid, check the **success** variable.
+
+Should be used on app startup to check whether the user login session is still valid.
+
+
+### Logout
+
+Request URL `http://{our_ip}:5000/api/auth/logout/`
+
+Method - **GET**
+
+Accepts an authentication **token** in the query.
+
+Deactivates the user login session.
 
 
 ### Get User By Token
 
 Request URL `http://{our_ip}:5000/api/auth/get-user-by-token/`
 
-Method **GET**
+Method - **GET**
 
-Accepts the **token** in the query.
+Accepts an authentication **token** in the query.
 
-Returns the **user** object with all the info about the user.
-
-Will be used to load a user in the settings.
+Gives away a **user** object containing all info about the user.
 
 
-### Get User By Id
-
-Request URL `http://{our_ip}:5000/api/auth/get-user-by-id/`
-
-Method **GET**
-
-Accepts the **id** in the query.
-
-Returns the **user** object with all the info about the user.
-
-Will be used to load a user in the chat and to check if the message sent by a user is yours while loading the messages or while deleting/editing the message.
-
-
-### Get Reset Token 
+### Get Reset Token
 
 Request URL `http://{our_ip}:5000/api/auth/get-reset-token/`
 
-Method **POST**
+Method - **POST**
 
-Accepts the **email** in the body.
+Accepts an **email** in the body.
 
-Will send the reset code in the email.
-
-**Code will be valid for 10 mins only!!!.***
+Sends an email reset token to the email that was gives.
 
 
-### Verify Reset Token 
+### Verify Reset Token
 
 Request URL `http://{our_ip}:5000/api/auth/verify-reset-token/`
 
-Method **GET**
+Method - **GET**
 
-Accepts the **token** in the body which could be retreived from the email.
+Accepts a password reset **token** in the query.
 
-Will check if the reset code is valid.
+Returns whether the password reset token is valid and if it can be used to reset the password.
+
+Should be used on the password reset screen to check if the token you entered is valid.
 
 
 ### Reset Password
 
-Request URL `https://{our_ip}:5000/api/auth/reset-password/`
+Request URL `http://{our_ip}:5000/api/auth/reset-password/`
 
-Method **POST**
+Method - **POST**
 
-Accepts the **token** and the **password** in the bydy.
+Accepts a password reset **token** and the new **password** in the body.
 
-Will reset the password to the new one.
-
-
-### Send Message 
-
-Request URL `http://{our_ip}:5000/api/chat/send-message/`
-
-Method **POST**
-
-Accepts the message **text**, the **time**, the auth **token**, and the **chatId** in body.
+Changes the password to the one you provided.
 
 
-### Load Chat Info
+### Get User By ID
 
-Request URL `http://{our_ip}:5000/api/chat/load-chat/`
+Request URL `http://{our_ip}:5000/api/auth/get-user-by-id/`
 
-Method **GET**
+Method - **GET**
 
-Accepts the **chatId** in the query.
+Accepts an authentication **token** in the query.
 
-Return the info about the chat: IDs of ppl in it, and the name of the chat.
-
-**ONLY WORKS FOR CHATS WITH 2 PPL IN IT RIGHT NOW**
+Returns the **user** object.
 
 
-### Create Chat 
+### Change Bio
 
-Request URL `http://{our_ip}:5000/api/chat/create-chat/`
+Request URL `http://{our_ip}:5000/api/auth/change-bio/`
 
-Method **POST**
+Method - **POST**
 
-Accepts the **userTo** ID of the User you want to create a chat with and your current **token** in the body.
+Accepts an authentication **token** and the new **bio** in the body.
 
-Will create an empty conversation with the person.
-
-
-### Load Messages 
-
-Request URL `http://{our_ip}:5000/api/chat/load-messages/`
-
-Method **GET** 
-
-Accepts the **part** (explained later) and the **chatId** in the query.
-
-PART will be the variable responsible for loading a part of messages.
-
-When we load the chat, we will want to load some amount of messages first, then when we scroll up, we'd need more and so on.
-
-**part** is the variable that will be responsible for that.
-
-Initialy it will start with 0, then as we scroll it'd icrement with every 25 messages, and when the messages are cached, we'd want to cache this variable too,
-
-so we wouldn't have to load all the messages again.
-
-Only when we get a new message in real time, or when we see that the last message in the cache != the last message in we see we need to update it.
-
-Will return an array or messages:
-
-```
-[
-  {
-    time: (Time it was sent at),
-    fromId: (The ID of the user who sent it)
-    text: (The text of the message)
-    isRead: (If anyone read the message yet)
-    deletedForMe: (If you decided to hide the message for yourself)
-    chatId: (The ID of the chat it's in)
-  }
-]
-```
+Changes you bio to the new one.
 
 
-### Load Chats 
+### Update Profile Picture
 
-Request URL `http://{our_ip}:5000/api/chat/load-chats/`
+**NOT IMPLEMENTED YET**
 
-Method **GET**
+Request URL `http://{our_ip}:5000/api/auth/update-profile-picture/`
 
-Accepts the User Session **token** in the query.
+Method - **POST**
 
-Will return the list of chats and the basic info about them:
+Accepts an authentication **token** and the **profilePicture** file in the body.
 
-```
-{
-  userOne: (id of the first user),
-  userTwo: (id of the second user),
-  name: (if it's a group chat),
-  isDeleted: (if the chat is deleted),
-}
-```
 
-The API will be updated soon to support group chats, in that case it will return all of the user IDs, and it there's no name for the chat
+### Change Privacy Settings
 
-it'll return the names of the first few people in it.
+Request URL `http://{our_ip}:5000/api/auth/change-privacy-settings/`
 
-For the regular chats it's recommended to get the ID of the current User through the token, and then diplay the name of the other user and his profile picture.
+Method - **POST**
 
-Chats should also be cached, but I recommend we implement that algorithm later.
+Accepts an authentication **token**, **seeEmail**, **textMe**, **seeRealName** in the body.
 
-### Other APIs are still in development
+**Important**
+
+**All the variables except for the token HAVE TO BE NUMBERS**
+
+**0 -- ALLOW EVERYBODY**
+
+**1 -- ALLOW CONTACTS ONLY**
+
+**2 -- ALLOW NOBODY**
