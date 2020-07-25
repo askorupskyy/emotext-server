@@ -10,16 +10,16 @@ const Chat = sequelize.define("chat", {
   userOne: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   userTwo: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   isDeleted: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
 }, { freezeTableName: true });
 

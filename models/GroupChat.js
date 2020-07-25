@@ -14,22 +14,22 @@ const GroupChat = sequelize.define("groupChat", {
   isDeleted: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    default: false,
+    defaultValue: false,
   },
   creator: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   admins: {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
-    default: [],
+    defaultValue: [],
   },
 }, { freezeTableName: true });
 

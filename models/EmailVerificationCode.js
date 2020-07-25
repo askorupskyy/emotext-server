@@ -10,16 +10,16 @@ const EmailVerificationCode = sequelize.define("emailVerificationCode", {
   code: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   date: {
     type: DataTypes.DATE,
-    default: Date.now(),
+    defaultValue: Date.now(),
   },
 }, { freezeTableName: true });
 

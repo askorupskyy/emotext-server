@@ -10,15 +10,15 @@ const UserSession = sequelize.define("userSession", {
   userId: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   timestamp: {
     type: DataTypes.DATE,
-    default: Date.now(),
+    defaultValue: Date.now(),
   },
   isDeleted: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
 }, { freezeTableName: true });
 

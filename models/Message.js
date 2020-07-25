@@ -10,26 +10,26 @@ const Message = sequelize.define("message", {
   fromId: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   text: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   isRead: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
   chatId: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   isGroupChat: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    default: false,
+    defaultValue: false,
   },
 }, { freezeTableName: true });
 

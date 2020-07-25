@@ -10,28 +10,28 @@ const UserRestrictions = sequelize.define("userRestrictions", {
   restrictedUserID: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   userID: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   isMuted: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
   isBlocked: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
   canCall: {
     type: DataTypes.BOOLEAN,
-    default: true,
+    defaultValue: true,
   },
-  canSendPics: {
+  canSendMedia: {
     type: DataTypes.BOOLEAN,
-    default: true,
+    defaultValue: true,
   },
 }, { freezeTableName: true });
 

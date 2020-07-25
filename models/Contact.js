@@ -10,20 +10,20 @@ const Contact = sequelize.define("contact", {
   userOneId: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   userTwoId: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   userOneName: {
     type: DataTypes.STRING,
-    default: "",
+    defaultValue: "",
   },
   userTwoName: {
     type: DataTypes.STRING,
-    default: "",
+    defaultValue: "",
   },
 }, { freezeTableName: true });
 

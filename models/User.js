@@ -24,32 +24,38 @@ const User = sequelize.define("User", {
   },
   profilePictureURL: {
     type: DataTypes.STRING,
-    default: "",
+    allowNull: false,
+    defaultValue: "",
   },
   bio: {
     type: DataTypes.STRING,
-    default: "",
+    allowNull: false,
+    defaultValue: "",
   },
   isDeleted: {
-    type: DataTypes.STRING,
-    default: false,
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   },
   username: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   seeRealName: {
     type: DataTypes.INTEGER,
-    default: 0,
+    allowNull: false,
+    defaultValue: 0,
   },
   seeEmail: {
     type: DataTypes.INTEGER,
-    default: 0,
+    allowNull: false,
+    defaultValue: 0,
   },
   textMe: {
     type: DataTypes.INTEGER,
-    default: 0,
+    allowNull: false,
+    defaultValue: 0,
   },
   // 0 - everybody
   // 1 - contacts only
@@ -57,15 +63,18 @@ const User = sequelize.define("User", {
   //many more privacy settings;
   isOnline: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    allowNull: false,
+    defaultValue: false,
   },
   lastSeen: {
     type: DataTypes.DATE,
-    default: Date.now(),
+    allowNull: false,
+    defaultValue: Date.now(),
   },
   addToGroupChats: {
     type: DataTypes.INTEGER,
-    default: 1,
+    allowNull: false,
+    defaultValue: 1,
   },
 
 }, { freezeTableName: true });

@@ -10,24 +10,24 @@ const FriendRequest = sequelize.define("friendRequest", {
   userFrom: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   userTo: {
     type: DataTypes.STRING,
     allowNull: false,
-    default: "",
+    defaultValue: "",
   },
   didAccept: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
   didReject: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
   didIgnore: {
     type: DataTypes.BOOLEAN,
-    default: false,
+    defaultValue: false,
   },
 }, { freezeTableName: true });
 
