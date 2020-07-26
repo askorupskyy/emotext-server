@@ -346,7 +346,7 @@ Accepts the **token** in the body.
 
 ### Get Contacts
 
-Request URL `http://{our_ip}:5000/api/contacts/get-friend-requests/`
+Request URL `http://{our_ip}:5000/api/contacts/get-contacts/`
 
 Method - **GET**
 
