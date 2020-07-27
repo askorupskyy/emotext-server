@@ -6,8 +6,31 @@ const UserSession = require("../../models/UserSession");
 const Contact = require("../../models/Contact");
 const FriendRequest = require("../../models/FriendRequest");
 const UserRestrictions = require("../../models/UserRestrictions");
+const { request } = require("chai");
 
 const router = express.Router();
+
+router.get("/find-contacts/", async (req, res) => {
+  const { query } = req;
+  const { searchQuery } = query;
+
+  const people = await User.findAll({
+    limit: 20,
+    where: {
+      [Op.or]: [
+        { 'username': { [Op.like]: '%' + searchQuery + '%' } },
+        { 'email': { [Op.like]: '%' + searchQuery + '%' } },
+        { 'name': { [Op.like]: '%' + searchQuery + '%' } },
+      ]
+    },
+  });
+
+  return res.send({
+    success: true,
+    message: "Users found",
+    people: people,
+  })
+})
 
 router.post("/send-friend-request/", async (req, res) => {
   const { body } = req;
@@ -494,19 +517,22 @@ router.get("/get-friend-requests/", async (req, res) => {
 
     const requests = await FriendRequest.findAll({
       where: {
-        [Op.or]: [{
-          userFrom: user.id,
-        },
-        {
-          userTo: user.id,
-        }]
+        userTo: user.id,
       }
+    })
+
+    const people = []
+
+    request.forEach(r => {
+      let person = await User.findByPk(r.userFrom);
+      people.push(person)
     })
 
     return res.status(200).send({
       success: true,
       message: "Contacts fetched",
       requests: requests,
+      people: people,
     })
   }
   catch (e) {
