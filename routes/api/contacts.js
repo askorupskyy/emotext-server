@@ -523,7 +523,7 @@ router.get("/get-friend-requests/", async (req, res) => {
 
     const people = []
 
-    request.forEach(async r => {
+    requests.forEach(async r => {
       let person = await User.findByPk(r.userFrom);
       people.push(person)
     })
