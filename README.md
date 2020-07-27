@@ -88,6 +88,8 @@ If not, then the message will tell you why.
 
 ## Contacts 
 
+[Find Contacts](#find-contacts)
+
 [Send Friend Request](#send-friend-request)
 
 [Ignore Friend Request](#ignore-friend-request)
@@ -253,3 +255,103 @@ Accepts an authentication **token**, **seeEmail**, **textMe**, **seeRealName** i
 **1 -- ALLOW CONTACTS ONLY**
 
 **2 -- ALLOW NOBODY**
+
+
+### Find Contacts
+
+Request URL `http://{our_ip}:5000/api/contacts/find-contacts/`
+
+Method - **GET**
+
+Accepts the **searchQuery** in the query.
+
+
+### Send Friend Request
+
+Request URL `http://{our_ip}:5000/api/contacts/send-friend-request/`
+
+Method - **POST**
+
+Accepts the **token** and the **friend** ID in the query.
+
+
+### Ignore Friend Request
+
+Request URL `http://{our_ip}:5000/api/contacts/ignore-friend-request/`
+
+Method - **POST**
+
+Accepts the **token** and **requestID** in the body.
+
+
+### Decline Friend Request
+
+Request URL `http://{our_ip}:5000/api/contacts/decline-friend-request/`
+
+Method - **POST**
+
+Accepts the **token** and **requestID** in the body.
+
+
+### Cancel Friend Request
+
+Request URL `http://{our_ip}:5000/api/contacts/cancel-friend-request/`
+
+Method - **POST**
+
+Accepts the **token** and **requestID** in the body.
+
+**ONLY THE USER WHO SENT THE REQUEST CAN CANCEL IT**
+
+
+### Accept Friend Request
+
+Request URL `http://{our_ip}:5000/api/contacts/accept-friend-request/`
+
+Method - **POST**
+
+Accepts the **token** and **requestID** in the body.
+
+
+### Rename Friend
+
+Request URL `http://{our_ip}:5000/api/contacts/rename-friend/`
+
+Method - **POST**
+
+Accepts the **token** and **friendID** and **name** in the body.
+
+
+### Delete Friend
+
+Request URL `http://{our_ip}:5000/api/contacts/decline-friend-request/`
+
+Method - **POST**
+
+Accepts the **token** and **friendID** in the body.
+
+
+### Get Friend Requests
+
+Request URL `http://{our_ip}:5000/api/contacts/get-friend-requests/`
+
+Method - **GET**
+
+Accepts the **token** in the body.
+
+**WILL RETURN THE FRIEND REQUEST OBJECTS**
+
+```requests```
+
+
+### Get Contacts
+
+Request URL `http://{our_ip}:5000/api/contacts/get-contacts/`
+
+Method - **GET**
+
+Accepts the **token** in the body.
+
+**WILL RETURN THE FRIEND REQUEST OBJECTS**
+
+```contacts```
