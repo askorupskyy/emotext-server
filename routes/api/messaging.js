@@ -304,3 +304,5 @@ router.get("/search-message/", async (req, res) => {
     });
   }
 });
+
+module.exports = router;
