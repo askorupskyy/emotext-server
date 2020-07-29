@@ -6,7 +6,6 @@ const UserSession = require("../../models/UserSession");
 const Contact = require("../../models/Contact");
 const FriendRequest = require("../../models/FriendRequest");
 const UserRestrictions = require("../../models/UserRestrictions");
-const { request } = require("chai");
 
 const router = express.Router();
 
@@ -146,6 +145,7 @@ router.post("/send-friend-request/", async (req, res) => {
       message: "Friend request sent",
     });
   } catch (e) {
+    console.log(e)
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -521,12 +521,12 @@ router.get("/get-friend-requests/", async (req, res) => {
       }
     })
 
-    const people = []
+    let people = []
 
-    requests.forEach(async r => {
-      let person = await User.findByPk(r.userFrom);
-      people.push(person)
-    })
+    for (let i = 0; i < requests.length; i++) {
+      let person = await User.findByPk(requests[i].userFrom);
+      people.push(person.dataValues)
+    }
 
     return res.status(200).send({
       success: true,
@@ -575,10 +575,18 @@ router.get("/get-contacts/", async (req, res) => {
       }
     })
 
+    let users = [];
+
+    for (let i = 0; i < contacts.length; i++) {
+      let user = await User.findByPk(contacts[i].userOneId === user.id ? contacts[i].userOneId : contacts[i].userTwoId);
+      users.push(user.dataValues);
+    }
+
     return res.status(200).send({
       success: true,
       message: "Contacts fetched",
       contacts: contacts,
+      users: users,
     })
   }
   catch (e) {
