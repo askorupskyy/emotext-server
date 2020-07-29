@@ -6,6 +6,7 @@ const { Op } = require("sequelize");
 
 const UserSession = require("../../models/UserSession");
 const PasswordResetCode = require("../../models/PasswordResetCode");
+const EmailVerificationCode = require("../../models/EmailVerificationCode");
 const User = require("../../models/User");
 
 const { SMTP_EMAIL, SMTP_PASSWORD, HOST } = require("../../cfg");
@@ -37,12 +38,63 @@ const handlebarsOptions = {
   extName: ".html",
 };
 
-smtpTransport.use("compile", hbs(handlebarsOptions));
+//smtpTransport.use("compile", hbs(handlebarsOptions));
+
+router.get("/email-verification-code/", async (req, res) => {
+  const { query } = req;
+  let { email } = query;
+  if (!email) {
+    return res.status(401).send({
+      success: false,
+      message: "Email field cannot be empty!",
+    });
+  }
+  let codes = await EmailVerificationCode.findOne({
+    where: {
+      email: email
+    },
+    order: [['updatedAt', 'DESC']]
+  })
+  if (codes) {
+    let codesDate = new Date(codes.date).getTime();
+    let currentDate = new Date().getTime();
+    if (currentDate - codesDate < 60000) {
+      return res.status(401).send({
+        success: false,
+        message: "Cannot request a code that often",
+      });
+    }
+  }
+  email = email.toLowerCase();
+  const code = await EmailVerificationCode.create({ code: generateLink(6), email: email });
+  let data = {
+    to: email,
+    from: SMTP_EMAIL,
+    text: `Hello! Your Sign Up Code is: ${code.id}`,
+    subject: "Your messaging app code!",
+    context: {
+      code: code.id
+    },
+  };
+
+  smtpTransport.sendMail(data, function (err) {
+    if (!err)
+      return res.status(200).send({
+        success: true,
+        message: "Code sent!"
+      })
+    console.log(err)
+    return res.status(500).send({
+      success: false,
+      message: "Server error",
+    });
+  });
+})
 
 router.post("/signup/", async (req, res) => {
   const { body } = req;
-  const { name, password, username } = body;
-  let { email } = body;
+  const { name, password, code } = body;
+  let { email, username } = body;
   if (!name || !password || !email || !username) {
     return res.status(401).send({
       success: false,
@@ -50,6 +102,28 @@ router.post("/signup/", async (req, res) => {
     });
   }
   email = email.toLowerCase();
+  username = username.toLowerCase();
+  let codes = await EmailVerificationCode.findOne({
+    where: {
+      email: email,
+      code: code
+    },
+    order: [['updatedAt', 'DESC']]
+  })
+  if (!codes) {
+    return res.status(401).send({
+      success: false,
+      message: "The code is invalid"
+    })
+  }
+  let codesDate = new Date(codes.date).getTime();
+  let currentDate = new Date().getTime();
+  if (currentDate - codesDate > 600000) {
+    return res.status(401).send({
+      success: false,
+      message: "The code is not valid anymore",
+    });
+  }
   const user = await User.findOne({
     where: {
       [Op.or]: [{ email: email }, { username: username }],
