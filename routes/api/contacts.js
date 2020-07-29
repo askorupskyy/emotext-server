@@ -145,7 +145,6 @@ router.post("/send-friend-request/", async (req, res) => {
       message: "Friend request sent",
     });
   } catch (e) {
-    console.log(e)
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -533,8 +532,8 @@ router.get("/get-friend-requests/", async (req, res) => {
         return res.status(200).send({
           success: true,
           message: "Contacts fetched",
-          contacts: contacts,
-          users: users,
+          contacts: requests,
+          users: people,
         })
       }
     }
