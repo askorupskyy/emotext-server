@@ -108,6 +108,16 @@ If not, then the message will tell you why.
 
 [Get Contacts](#get-contacts)
 
+## Messaging
+
+[Send Message](#send-message)
+
+[Delete Message](#delete-message)
+
+[Edit Message](#edit-message)
+
+[Search Message](#search-message)
+
 
 ### Signup
 
@@ -355,3 +365,39 @@ Accepts the **token** in the body.
 **WILL RETURN THE FRIEND REQUEST OBJECTS**
 
 ```contacts```
+
+
+### Send Message
+
+Request URL `http://{our_ip}:5000/api/messaging/send-message/`
+
+Method - **POST**
+
+Accepts the **token**, **text**, **chatID**, and **isGroupChat** in the body.
+
+
+### Delete Message
+
+Request URL `http://{our_ip}:5000/api/messaging/delete-message/`
+
+Method - **DELETE**
+
+Accepts the **token**, **text**, **chatID**, **messageID**, and **isGroupChat** in the body.
+
+
+### Edit Message
+
+Request URL `http://{our_ip}:5000/api/messaging/edit-message/`
+
+Method - **POST**
+
+Accepts the **token**, **text**, **chatID**, **messageID**, and **isGroupChat** in the body.
+
+
+### Edit Message
+
+Request URL `http://{our_ip}:5000/api/messaging/search-message/`
+
+Method - **GET**
+
+Accepts the **token**, **chatID**, **searchQuery**, and **isGroupChat** in the body.
