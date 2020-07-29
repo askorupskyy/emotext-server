@@ -21,6 +21,10 @@ const Message = sequelize.define("message", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  readBy: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: [],
+  },
   chatId: {
     type: DataTypes.STRING,
     allowNull: false,
