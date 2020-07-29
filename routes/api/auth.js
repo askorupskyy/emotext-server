@@ -40,6 +40,7 @@ const handlebarsOptions = {
 
 //smtpTransport.use("compile", hbs(handlebarsOptions));
 
+/*
 router.get("/email-verification-code/", async (req, res) => {
   const { query } = req;
   let { email } = query;
@@ -90,6 +91,7 @@ router.get("/email-verification-code/", async (req, res) => {
     });
   });
 })
+*/
 
 router.post("/signup/", async (req, res) => {
   const { body } = req;
@@ -103,6 +105,7 @@ router.post("/signup/", async (req, res) => {
   }
   email = email.toLowerCase();
   username = username.toLowerCase();
+  /*
   let codes = await EmailVerificationCode.findOne({
     where: {
       email: email,
@@ -124,6 +127,8 @@ router.post("/signup/", async (req, res) => {
       message: "The code is not valid anymore",
     });
   }
+  */
+
   const user = await User.findOne({
     where: {
       [Op.or]: [{ email: email }, { username: username }],
