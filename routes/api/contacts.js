@@ -526,6 +526,14 @@ router.get("/get-friend-requests/", async (req, res) => {
     for (let i = 0; i < requests.length; i++) {
       let person = await User.findByPk(requests[i].userFrom);
       people.push(person.dataValues)
+      if (i === requests.length - 1) {
+        return res.status(200).send({
+          success: true,
+          message: "Contacts fetched",
+          contacts: contacts,
+          users: users,
+        })
+      }
     }
 
     return res.status(200).send({
@@ -580,6 +588,14 @@ router.get("/get-contacts/", async (req, res) => {
     for (let i = 0; i < contacts.length; i++) {
       let user = await User.findByPk(contacts[i].userOneId === user.id ? contacts[i].userOneId : contacts[i].userTwoId);
       users.push(user.dataValues);
+      if (i === contacts.length - 1) {
+        return res.status(200).send({
+          success: true,
+          message: "Contacts fetched",
+          contacts: contacts,
+          users: users,
+        })
+      }
     }
 
     return res.status(200).send({
