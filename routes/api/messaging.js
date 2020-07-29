@@ -143,7 +143,8 @@ router.delete("/delete-message/", async (req, res) => {
     }
 
     const chat = await Chat.findByPk(chatID);
-    if (!chat || chat.users.indexOf(user.id) === -1) {
+
+    if (!chat || (chat.userOne !== user.id && chat.userTwo !== user.id)) {
       return res.status(401).send({
         success: false,
         message: "Wrong chat",
@@ -151,19 +152,6 @@ router.delete("/delete-message/", async (req, res) => {
     }
 
     const message = await Message.findByPk(messageID);
-    if (!message) {
-      return res.status(404).send({
-        success: false,
-        message: "The message does not exist",
-      });
-    }
-
-    if (message.from !== user.id) {
-      return res.status(401).send({
-        success: false,
-        message: "Can't dlete other people's messages",
-      });
-    }
 
     await message.destroy();
 
@@ -171,7 +159,8 @@ router.delete("/delete-message/", async (req, res) => {
       success: true,
       message: "Message deleted",
     });
-  } catch {
+  }
+  catch {
     return res.status(401).send({
       success: false,
       message: "Invalid token",
@@ -181,7 +170,7 @@ router.delete("/delete-message/", async (req, res) => {
 
 router.post("/edit-message/", async (req, res) => {
   const { body } = req;
-  const { token, chatID, messageID, text } = body;
+  const { token, chatID, messageID, text, isGroupChat } = body;
 
   if (!text) {
     return res.status(401).send({
@@ -248,7 +237,7 @@ router.post("/edit-message/", async (req, res) => {
 
 router.get("/search-message/", async (req, res) => {
   const { query } = req;
-  const { chatID, searchQuery, token } = query;
+  const { chatID, searchQuery, token, isGroupChat } = query;
 
   if (!searchQuery) {
     return res.status(404).send({
@@ -274,12 +263,23 @@ router.get("/search-message/", async (req, res) => {
       });
     }
 
-    const chat = await Chat.findByPk(chatID);
-    if (!chat || chat.users.indexOf(user.id) === -1) {
-      return res.status(401).send({
-        success: false,
-        message: "Wrong chat",
-      });
+    if (isGroupChat) {
+      const chat = await Chat.findByPk(chatID);
+      if (!chat || chat.users.indexOf(user.id) === -1) {
+        return res.status(401).send({
+          success: false,
+          message: "Wrong chat",
+        });
+      }
+    }
+    else {
+      const chat = await Chat.findByPk(chatID);
+      if (!chat || (chat.userOne !== user.id && chat.userTwo !== user.id)) {
+        return res.status(401).send({
+          success: false,
+          message: "Wrong chat",
+        });
+      }
     }
 
     const messages = await Message.findAll({
@@ -287,6 +287,8 @@ router.get("/search-message/", async (req, res) => {
         text: {
           [Op.like]: `%${searchQuery}%`,
         },
+        chatId: chatID,
+        isGroupChat: isGroupChat
       },
     });
 
