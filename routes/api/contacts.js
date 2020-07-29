@@ -518,6 +518,7 @@ router.get("/get-friend-requests/", async (req, res) => {
     const requests = await FriendRequest.findAll({
       where: {
         userTo: user.id,
+        didAccept: false,
       }
     })
 
