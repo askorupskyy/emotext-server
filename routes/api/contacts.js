@@ -519,6 +519,8 @@ router.get("/get-friend-requests/", async (req, res) => {
       where: {
         userTo: user.id,
         didAccept: false,
+        didReject: false,
+        didIgnore: false
       }
     })
 
