@@ -244,7 +244,7 @@ router.get("/load-chats/", async (req, res, next) => {
 
       let message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
 
-      allChats.push({ id: chats[i].id, name: name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+      allChats.push({ id: chats[i].id, isGroupChat: false, name: name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
     }
 
     for (let i = 0; i < groupChats.length; i++) {
@@ -252,13 +252,13 @@ router.get("/load-chats/", async (req, res, next) => {
 
       let message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
 
-      allChats.push({ id: groupChats[i].id, name: groupChats[i].name, pictureURL: groupChats[i].pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+      allChats.push({ id: groupChats[i].id, isGroupChat: false, name: groupChats[i].name, pictureURL: groupChats[i].pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
     }
 
     return res.status(200).send({
       success: true,
       message: "Chats loaded",
-      chats: chats,
+      chats: allChats,
     });
   } catch {
     return res.status(401).send({
