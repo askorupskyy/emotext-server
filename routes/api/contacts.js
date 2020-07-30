@@ -588,8 +588,8 @@ router.get("/get-contacts/", async (req, res) => {
     let users = [];
 
     for (let i = 0; i < contacts.length; i++) {
-      let user = await User.findByPk(contacts[i].userOneId === user.id ? contacts[i].userOneId : contacts[i].userTwoId);
-      users.push(user.dataValues);
+      let u = await User.findByPk(contacts[i].userOneId != user.id ? contacts[i].userOneId : contacts[i].userTwoId);
+      users.push(u.dataValues);
       if (i === contacts.length - 1) {
         return res.status(200).send({
           success: true,
