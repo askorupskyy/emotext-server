@@ -179,7 +179,7 @@ router.get("/load-chats/", async (req, res, next) => {
   const { token } = query;
 
   try {
-    const session = UserSession.findByPk(token);
+    const session = await UserSession.findByPk(token);
     if (!session || session.isDeleted) {
       return res.status(401).send({
         success: false,
@@ -187,7 +187,7 @@ router.get("/load-chats/", async (req, res, next) => {
       });
     }
 
-    const user = await User.findByPk(token);
+    const user = await User.findByPk(session.userId);
     if (!user) {
       return res.status(401).send({
         success: false,
@@ -197,14 +197,12 @@ router.get("/load-chats/", async (req, res, next) => {
 
     const chats = await Chat.findAll({
       where: {
-        $or: [
+        [Op.or]: [
           {
-            userOne: { $eq: user.id },
+            userOne: user.id,
           },
           {
-            userTwo: {
-              $eq: user.id,
-            },
+            userTwo: user.id,
           },
         ],
       },
@@ -222,7 +220,7 @@ router.get("/load-chats/", async (req, res, next) => {
       let name = "";
       let pictureURL = "";
       if (chats[i].userOne !== user.id) {
-        name = await Contact.findAll({
+        contact = await Contact.findOne({
           where: {
             [Op.or]: [{ userOneId: chats[i].userOne }, { userTwoId: chats[i].userOne }]
           }
@@ -231,7 +229,7 @@ router.get("/load-chats/", async (req, res, next) => {
         pictureURL = user.profilePictureURL;
       }
       else if (chats[i].userOne === user.id) {
-        name = await Contact.findAll({
+        contact = await Contact.findOne({
           where: {
             [Op.or]: [{ userOneId: chats[i].userTwo }, { userTwoId: chats[i].userTwo }]
           }
@@ -242,15 +240,22 @@ router.get("/load-chats/", async (req, res, next) => {
 
       let lastMessage = await Message.findOne({ where: { chatId: chats[i].id, isGroupChat: false }, order: [['createdAt', 'DESC']] });
 
-      let message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
+      let message = {};
 
-      allChats.push({ id: chats[i].id, isGroupChat: false, name: name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+      if (lastMessage) {
+        message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
+      }
+      allChats.push({ id: chats[i].id, isGroupChat: false, name: user.name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
     }
 
     for (let i = 0; i < groupChats.length; i++) {
       let lastMessage = await Message.findOne({ where: { chatId: chats[i].id, isGroupChat: true }, order: [['createdAt', 'DESC']] });
 
-      let message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
+      let message = {};
+
+      if (lastMessage) {
+        message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
+      }
 
       allChats.push({ id: groupChats[i].id, isGroupChat: false, name: groupChats[i].name, pictureURL: groupChats[i].pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
     }
@@ -260,7 +265,8 @@ router.get("/load-chats/", async (req, res, next) => {
       message: "Chats loaded",
       chats: allChats,
     });
-  } catch {
+  } catch (e) {
+    console.log(e);
     return res.status(401).send({
       success: false,
       message: "Invalid token",
