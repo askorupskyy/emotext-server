@@ -9,7 +9,7 @@ services:
     depends_on: 
       - db
     command: > 
-      sh -c "npm run start"
+      sh -c "npm run migrate && npm run start"
 
   ml:
     build: . 
