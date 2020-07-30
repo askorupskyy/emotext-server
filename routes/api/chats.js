@@ -5,6 +5,9 @@ const { Op } = require("sequelize");
 const Chat = require("../../models/Chat");
 const UserSession = require("../../models/UserSession");
 const User = require("../../models/User");
+const GroupChat = require("../../models/GroupChat");
+const Contact = require("../../models/Contact");
+const Message = require("../../models/Message");
 
 router.get("/load-chat/", async (req, res, next) => {
   const { query } = req;
@@ -192,7 +195,7 @@ router.get("/load-chats/", async (req, res, next) => {
       });
     }
 
-    chats = await Chat.findAll({
+    const chats = await Chat.findAll({
       where: {
         $or: [
           {
@@ -206,6 +209,51 @@ router.get("/load-chats/", async (req, res, next) => {
         ],
       },
     });
+
+    const groupChats = await GroupChat.findAll({
+      where: {
+        users: { [Op.contains]: [user.id] }
+      }
+    })
+
+    const allChats = [];
+
+    for (let i = 0; i < chats.length; i++) {
+      let name = "";
+      let pictureURL = "";
+      if (chats[i].userOne !== user.id) {
+        name = await Contact.findAll({
+          where: {
+            [Op.or]: [{ userOneId: chats[i].userOne }, { userTwoId: chats[i].userOne }]
+          }
+        })
+        let user = await User.findByPk(chats[i].userOne);
+        pictureURL = user.profilePictureURL;
+      }
+      else if (chats[i].userOne === user.id) {
+        name = await Contact.findAll({
+          where: {
+            [Op.or]: [{ userOneId: chats[i].userTwo }, { userTwoId: chats[i].userTwo }]
+          }
+        })
+        let user = await User.findByPk(chats[i].userTwo);
+        pictureURL = user.profilePictureURL;
+      }
+
+      let lastMessage = await Message.findOne({ where: { chatId: chats[i].id, isGroupChat: false }, order: [['createdAt', 'DESC']] });
+
+      let message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
+
+      allChats.push({ id: chats[i].id, name: name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+    }
+
+    for (let i = 0; i < groupChats.length; i++) {
+      let lastMessage = await Message.findOne({ where: { chatId: chats[i].id, isGroupChat: true }, order: [['createdAt', 'DESC']] });
+
+      let message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
+
+      allChats.push({ id: groupChats[i].id, name: groupChats[i].name, pictureURL: groupChats[i].pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+    }
 
     return res.status(200).send({
       success: true,

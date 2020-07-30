@@ -31,6 +31,11 @@ const GroupChat = sequelize.define("groupChat", {
     allowNull: false,
     defaultValue: [],
   },
+  pictureURL: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "",
+  }
 }, { freezeTableName: true });
 
 module.exports = GroupChat;
