@@ -219,6 +219,7 @@ router.get("/load-chats/", async (req, res, next) => {
     for (let i = 0; i < chats.length; i++) {
       let name = "";
       let pictureURL = "";
+      let userID = "";
       if (chats[i].userOne !== user.id) {
         contact = await Contact.findOne({
           where: {
@@ -227,6 +228,7 @@ router.get("/load-chats/", async (req, res, next) => {
         })
         let user = await User.findByPk(chats[i].userOne);
         pictureURL = user.profilePictureURL;
+        userID = user.id;
       }
       else if (chats[i].userOne === user.id) {
         contact = await Contact.findOne({
@@ -236,6 +238,7 @@ router.get("/load-chats/", async (req, res, next) => {
         })
         let user = await User.findByPk(chats[i].userTwo);
         pictureURL = user.profilePictureURL;
+        userID = user.id;
       }
 
       let lastMessage = await Message.findOne({ where: { chatId: chats[i].id, isGroupChat: false }, order: [['createdAt', 'DESC']] });
@@ -245,7 +248,7 @@ router.get("/load-chats/", async (req, res, next) => {
       if (lastMessage) {
         message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
       }
-      allChats.push({ id: chats[i].id, isGroupChat: false, name: user.name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+      allChats.push({ id: chats[i].id, userID: userID, isGroupChat: false, name: user.name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
     }
 
     for (let i = 0; i < groupChats.length; i++) {
@@ -257,7 +260,7 @@ router.get("/load-chats/", async (req, res, next) => {
         message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
       }
 
-      allChats.push({ id: groupChats[i].id, isGroupChat: false, name: groupChats[i].name, pictureURL: groupChats[i].pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+      allChats.push({ id: groupChats[i].id, userID: "", isGroupChat: false, name: groupChats[i].name, pictureURL: groupChats[i].pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
     }
 
     return res.status(200).send({
