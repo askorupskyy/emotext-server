@@ -98,7 +98,7 @@ router.post("/send-message/", async (req, res, next) => {
       }
     }
 
-    const msg = await Message.create({
+    await Message.create({
       chatId: chatID,
       from: user.id,
       text: text,
@@ -112,7 +112,6 @@ router.post("/send-message/", async (req, res, next) => {
     return res.status(200).send({
       success: true,
       message: "Message Sent",
-      msg: msg,
     });
   } catch {
     return res.status(401).send({
