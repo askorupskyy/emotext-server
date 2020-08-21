@@ -30,7 +30,7 @@ router.post("/send-message/", async (req, res, next) => {
       });
     }
 
-    const user = await User.findByPk(session.userID);
+    const user = await User.findByPk(session.userId);
 
     if (!user) {
       return res.status(404).send({
@@ -90,30 +90,33 @@ router.post("/send-message/", async (req, res, next) => {
         },
       });
 
-      if (restrictions.isBlocked) {
-        res.status(401).send({
-          success: false,
-          message: "The user has blocked you from texting",
-        });
+      if (restrictions) {
+        if (restrictions.isBlocked) {
+          res.status(401).send({
+            success: false,
+            message: "The user has blocked you from texting",
+          });
+        }
+        if (restrictions && restrictions.isMuted) {
+          console.log("send no notification to the user");
+        }
       }
     }
 
-    await Message.create({
+    const msg = await Message.create({
       chatId: chatID,
       from: user.id,
       text: text,
       isGroupChat: isGroupChat,
     });
 
-    if (restrictions.isMuted) {
-      console.log("send no notification to the user");
-    }
-
     return res.status(200).send({
       success: true,
       message: "Message Sent",
+      msg: msg,
     });
-  } catch {
+  } catch (err) {
+    console.log(err)
     return res.status(401).send({
       success: false,
       message: "Invalid token",
