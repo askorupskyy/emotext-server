@@ -143,7 +143,7 @@ router.get("/load-messages/", async (req, res, next) => {
       });
     }
 
-    if (!chat.userOne !== user.id || !chat.userTwo !== user.id) {
+    if (chat.userOne != user.id && chat.userTwo != user.id) {
       return res.status(401).send({
         success: false,
         message: "User is not in the chat",

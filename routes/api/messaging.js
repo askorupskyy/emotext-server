@@ -105,7 +105,7 @@ router.post("/send-message/", async (req, res, next) => {
 
     const msg = await Message.create({
       chatId: chatID,
-      from: user.id,
+      fromId: user.id,
       text: text,
       isGroupChat: isGroupChat,
     });
