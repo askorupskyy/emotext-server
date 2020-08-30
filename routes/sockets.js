@@ -1,9 +1,16 @@
 module.exports = function (io) {
   io.sockets.on("connection", socket => {
 
+    socket.emit("user-online", userID);
+
+    socket.on("disconnected", userID => {
+      socket.emit("user-offline", userID);
+    })
+
+    //basic socket.io test
     socket.emit("message", "Hello World!");
 
-    //track users
+    //track users in friends list or in chats
     socket.on("watch-user", user => {
       socket.join(user.id);
       socket.on("send-friend-request", () => {
