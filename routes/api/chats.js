@@ -243,12 +243,16 @@ router.get("/load-chats/", async (req, res, next) => {
 
       let lastMessage = await Message.findOne({ where: { chatId: chats[i].id, isGroupChat: false }, order: [['createdAt', 'DESC']] });
 
-      let message = {};
+      let message;
 
       if (lastMessage) {
-        message = { fromYou: lastMessage.fromId === user.id, isRead: lastMessage.isRead, text: lastMessage.text };
+        message = lastMessage;
       }
-      allChats.push({ id: chats[i].id, userID: userID, isGroupChat: false, name: user.name, pictureURL: pictureURL, lastMessage: { fromYou: message.fromYou, isRead: message.isRead, text: message.text } });
+      else {
+        message = null;
+      }
+
+      allChats.push({ id: chats[i].id, userID: userID, isGroupChat: false, name: user.name, pictureURL: pictureURL, lastMessage: message });
     }
 
     for (let i = 0; i < groupChats.length; i++) {
