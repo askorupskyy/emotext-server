@@ -30,6 +30,32 @@ Use `docker-compose -f "docker-compose-ci.yml" build` and `docker-compose -f "do
 
 **CHECK THE MODELS FOLDER TO SEE THE STRUCTURE OF THE OBJECTS THAT WILL BE RETURNED BY THE API**
 
+# Socket.io APIs 
+
+Socket.io allows us to send data in real time.
+
+Everything is listed in routes/sockets.js
+
+the second line, io.sockets.on.("connection") is what happens when a device is connected to the socket.io server. (should be done is some root file or main component). this will trigger the event that sets the user status to Online. (not working yet)
+
+when disconnected we set the the status to offline.
+
+when we open up a chat, we join a socket room.
+
+we give two arguments, isGroup (whether the chat is a group chat) and chatID
+
+then when we do something with a chat on the client, we emit an event on the client.
+
+let's say we send a message. the server gets the event with the message and emits another event with the same object to all other clients in that chat.
+same is for all other chat events, like kicking a user out, changing the name, and so on. 
+
+to track the users, we would want to use watch-user event, where we pass the userID of the user we want to watch. 
+it also joins a room, and then checks for the changes in that room just like with the chats. 
+the client can join multiple socket.io rooms at once, so when you load your contact list, for example, 
+you would want to emit contacts.length events, each time passing the user object.
+
+when catching an event on the client you just need to update that user with the new value.
+
 # API response structure
 
 Every time the API gets a request, it will return the data in the following structure:
