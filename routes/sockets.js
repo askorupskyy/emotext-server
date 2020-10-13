@@ -1,7 +1,7 @@
 module.exports = function (io) {
   io.sockets.on("connection", socket => {
 
-    socket.emit("user-online", userID);
+    socket.emit("user-online");
 
     socket.on("disconnected", userID => {
       socket.emit("user-offline", userID);
