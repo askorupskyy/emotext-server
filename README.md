@@ -1,5 +1,49 @@
 # Messaging App API
 
+# Idea
+
+This is a messenger with Machine Learning that analyses emotions of a person using Natural Language Processing and shows them to other people they have a conversation with. It helps users interact and communicate better.
+
+# Technologies:
+
+## Backend
+My part
+
+- JavaScript + Node.js -> language for most of the backend. 
+- Express.js -> Node.js framework for making the APIs.
+- Flask -> Python framework for making ML APIs. (connects to our main Node.js APIs)
+- PostgreSQL -> database used for the backend. (connects to our main Node.js APIs)
+- Socket.io -> technology used for making realtime connections with the client apps. (used with Node.js)
+- Travis.CI -> used for automated testing when the new version of the server is pushed.
+- Docker + Docker Compose -> technology that packs out app in a mini Linux Virtual machine so the setup is the same on every device we run it on.
+- Mocha + Chai -> automated testing technologies for Node.js. (used with travis.ci)
+- Postman -> library for sending emails using Node.js. (used for user authentication)
+
+My partner's part
+- Python -> language for the machine learning part.
+- Pandas, Keras, Tensorflow -> libraries used for machine learning.
+
+## Android Client (My partner's part)
+- Java
+- Android Studio
+- Socket.io Client
+Link to GitHub repo: https://github.com/devr0306/EmoText
+
+## iOS Client (My part)
+- Swift
+- SwiftUI
+- XCode
+- Socket.io Client
+Link to GitHub repo: https://github.com/rcbxd/messaging-app-client
+
+## Web Client (My part/Not started working on it yet)
+- TypeScript
+- React
+- Redux
+- Socket.io Client
+- Sass
+- Webpack
+
 # Dev Environment
 
 Make sure **Docker** is installed on your computer and that you have an account in it.
