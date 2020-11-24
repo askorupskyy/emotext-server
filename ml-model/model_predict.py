@@ -113,4 +113,8 @@ class Model:
 
     return np.round(np.mean(predictions))
 
-  #def predict_sentiment(self, json_data):
+  def predict_sentiment(self, json_data):
+    import json
+
+    texts = json.loads(json_data)
+    return self.predict(texts['texts'])
