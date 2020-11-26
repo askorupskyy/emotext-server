@@ -26,7 +26,7 @@ def predict():
 
 
 @app.route('/predict_list', methods=['POST'])
-def predict():
+def predict_list():
     
     prediction = MESSAGES_MODEL.predict(request.get_json()['texts'])
     return jsonify({"success": True, "message": ("negative" if prediction > 0.5 else "positive")})
