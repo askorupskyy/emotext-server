@@ -1,5 +1,9 @@
 # Messaging App API
 
+# Google Play
+
+https://play.google.com/store/apps/details?id=com.emotext.chatapp
+
 # Idea
 
 This is a messenger with Machine Learning that analyses emotions of a person using Natural Language Processing and shows them to other people they have a conversation with. It helps users interact and communicate better.
