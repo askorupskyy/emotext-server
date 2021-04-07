@@ -23,11 +23,11 @@ My part
 - Mocha + Chai -> automated testing technologies for Node.js. (used with travis.ci)
 - Postman -> library for sending emails using Node.js. (used for user authentication)
 
-My partner's part
+Dev's part
 - Python -> language for the machine learning part.
 - Pandas, Keras, Tensorflow -> libraries used for machine learning.
 
-## Android Client (My partner's part)
+## Android Client (Dev's part)
 - Java
 - Android Studio
 - Socket.io Client
@@ -39,14 +39,6 @@ Link to GitHub repo: https://github.com/devr0306/EmoText
 - XCode
 - Socket.io Client
 Link to GitHub repo: https://github.com/rcbxd/messaging-app-client
-
-## Web Client (My part/Not started working on it yet)
-- TypeScript
-- React
-- Redux
-- Socket.io Client
-- Sass
-- Webpack
 
 # Dev Environment
 
